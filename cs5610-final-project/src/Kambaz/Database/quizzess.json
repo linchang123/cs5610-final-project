@@ -1,0 +1,11 @@
+[
+    { "_id": "Q101", "title": "Propulsion Quiz", "course": "RS101", "availableDate": "2025-05-01", "dueDate": "2025-05-07", "points": 29, },
+    { "_id": "Q102", "title": "Combustion Analysis Quiz", "course": "RS101", "availableDate": "2025-05-07", "dueDate": "2025-05-13"},
+    { "_id": "Q103", "title": "Nozzle Design Quiz", "course": "RS101", "availableDate": "2025-05-13", "dueDate": "2025-05-20"},
+    { "_id": "Q201", "title": "Aerodynamics Quiz", "course": "RS102", "availableDate": "2025-05-01", "dueDate": "2025-05-07" },
+    { "_id": "Q202", "title": "Flow Analysis Quiz", "course": "RS102", "availableDate": "2025-05-07", "dueDate": "2025-05-13" },
+    { "_id": "Q203", "title": "Heating Analysis Quiz", "course": "RS102", "availableDate": "2025-05-13", "dueDate": "2025-05-20"},
+    { "_id": "Q301", "title": "Structural Design Quiz", "course": "RS103", "availableDate": "2025-05-01", "dueDate": "2025-05-07" },
+    { "_id": "Q302", "title": "Orbital Calculations Quiz", "course": "RS103", "availableDate": "2025-05-07", "dueDate": "2025-05-13" },
+    { "_id": "Q303", "title": "Systems Engineering Exam", "course": "RS103", "availableDate": "2025-05-13", "dueDate": "2025-05-20" }
+  ]
