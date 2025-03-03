@@ -7,7 +7,7 @@ body * {  font-family: Arial, Helvetica, sans-serif;  }
   }
 }
 
-@media (max-width: 1350px) {
+@media (max-width: 1400px) {
   #wd-search-assignment, #wd-search-quiz {
     display: none;
   }
