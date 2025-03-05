@@ -1,5 +1,5 @@
 import { IoMdArrowDropdown } from "react-icons/io";
-import { Row, Col } from "react-bootstrap";
+import { Row, Col, Dropdown } from "react-bootstrap";
 import { IoEllipsisVertical } from "react-icons/io5";
 import GreenCheckMark from "../utility/GreenCheckMark";
 import formatDate from "../utility/formatDate";
@@ -11,6 +11,7 @@ import { useState } from "react";
 import { v4 as uuidv } from "uuid";
 import { useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
+import { AiOutlineStop } from "react-icons/ai";
 
 export default function Quizzes() {
     const { cid } = useParams();
@@ -38,33 +39,43 @@ export default function Quizzes() {
             </div>
         </div>
         <hr/>
-        <div id="wd-quizzes-title" className="wd-title p-3 ps-2 bg-secondary fs-5 fw-bolder mt-4">
-            <IoMdArrowDropdown className="me-2 fs-3"/>
-            Assignment Quizzes
-        </div>
-        <ul id="wd-quiz-list" className="list-group rounded-0">
-            {/** Display the list of quizzes belonging to the current course */}
-          {quizzes
-          .filter((quiz: any) => quiz.course === cid)
-          .map((quiz: any) => (
-            <Quiz quizTitle={quiz.title}  
-            quizDue={formatDate(quiz.dueDate) + " at 11:59pm"}
-            quizURL={"#/Kambaz/Courses/" + cid + "/Quizzes/" + quiz._id}
-            // quizDetails=""
-            quizNumQuestions={quiz.numQuestions}
-            // quizAvailableFrom={quiz.availableFromDate}
-            // quizAvailableTil={quiz.availableTilDate}
-            quizPoints={quiz.points}/>
-          ))}
-        </ul>
+        <QuizList quizzes={quizzes} cid={cid ? cid : ""}/>
       </div>
   );
 }
-  
-const Quiz = ({quizTitle, quizDue, quizURL, quizPoints, quizNumQuestions, 
+
+const QuizList = ({quizzes, cid}:{quizzes: any; cid: string}) => {
+    let currCourseQuiz = quizzes.filter((quiz: any) => quiz.course === cid);
+    if (currCourseQuiz.length > 0) {
+        return (
+            <div id="wd-quiz-list">
+                <div id="wd-quizzes-title" className="wd-title p-3 ps-2 bg-secondary fs-5 fw-bolder mt-4">
+                    <IoMdArrowDropdown className="me-2 fs-3"/>
+                    Assignment Quizzes
+                </div>
+                <ul id="wd-quiz-list" className="list-group rounded-0">
+                {currCourseQuiz.map((quiz: any) => (
+                    <Quiz quizTitle={quiz.title}  quizDue={formatDate(quiz.dueDate) + " at 11:59pm"}
+                    quizURL={"#/Kambaz/Courses/" + cid + "/Quizzes/" + quiz._id}
+                    // quizDetails=""
+                    published={quiz.published}
+                    quizNumQuestions={quiz.numQuestions}
+                    // quizAvailableFrom={quiz.availableFromDate}
+                    // quizAvailableTil={quiz.availableTilDate}
+                    quizPoints={quiz.points}/>))}
+                </ul>
+            </div>
+        );
+    } else {
+        return (<h3 className="text-center text-secondary">Click on "+ Quiz" button to add new quiz</h3>);
+    }
+}
+
+const Quiz = ({quizTitle, quizDue, quizURL, quizPoints, quizNumQuestions, published
             //    quizAvailableFrom, quizAvailableTil
             }: {
         quizTitle: string; quizDue: string; quizURL: string; quizPoints: number; quizNumQuestions:number;
+        published: boolean
         // quizAvailableFrom: string; quizAvailableTil: string
     }) => {
     return (
@@ -81,10 +92,21 @@ const Quiz = ({quizTitle, quizDue, quizURL, quizPoints, quizNumQuestions,
 
              </div>
              <FacultyFeatures>
-                <div className="d-flex align-items-center ms-3" style={{minWidth: "68px"}}>
+                <div className="d-flex align-items-center ms-3" style={{minWidth: "120px"}}>
                     <Row>
-                        <Col><GreenCheckMark/></Col>
-                        <Col><IoEllipsisVertical className="fs-4" /></Col>
+                        <Col>{published? <GreenCheckMark/>: <AiOutlineStop className="fs-2"/>}</Col>
+                        <Col>
+                            <Dropdown className="float-end me-2">
+                                <Dropdown.Toggle id="wd-quiz-context-menu-btn" bsPrefix="btn" className="text-dark border-0 bg-transparent">
+                                    <IoEllipsisVertical className="fs-4" />
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                    <Dropdown.Item id="wd-quiz-menu-edit-option">Edit</Dropdown.Item>
+                                    <Dropdown.Item id="wd-quiz-menu-delete-option">Delete</Dropdown.Item>
+                                    <Dropdown.Item id="wd-quiz-menu-publish-option">Publish</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        </Col>
                     </Row>
                 </div>
              </FacultyFeatures>

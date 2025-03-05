@@ -1,7 +1,7 @@
 [
     { "_id": "Q101", "title": "Propulsion Quiz", "course": "RS101", "dueDate": "2025-05-07", "availableFromDate": "2025-05-01", "availableTilDate": "2025-05-07","points": 29, "numQuestions": 11,
       "quizType": "Graded Quiz", "assignmentGroup": "Quizzes", "shuffleAnswers": true, "timeLimit": 30, "multipleAttempts": true, "attempts": 2, "showCorrectAnswers": true, "accessCode": "",
-      "oneQAtATime": true, "webcamRequired": false, "lockQAfterAnswer": false, "published": true},
+      "oneQAtATime": true, "webcamRequired": false, "lockQAfterAnswer": false, "published": false},
     { "_id": "Q102", "title": "Combustion Analysis Quiz", "course": "RS101", "dueDate": "2025-05-13", "availableFromDate": "2025-05-07", "availableTilDate": "2025-05-13", "points": 32, "numQuestions": 7,
     "quizType": "Graded Quiz", "assignmentGroup": "Quizzes", "shuffleAnswers": false, "timeLimit": 30, "multipleAttempts": true, "attempts": 3, "showCorrectAnswers": true, "accessCode": "",
     "oneQAtATime": true, "webcamRequired": false, "lockQAfterAnswer": false, "published": true},

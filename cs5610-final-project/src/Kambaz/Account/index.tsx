@@ -11,10 +11,10 @@ export default function Account() {
   return (
     <div id="wd-account-screen">
       <Row>
-        <Col xs={1}>
+        <Col xs={2}>
           <AccountNavigation />
         </Col>
-        <Col xs={11}>
+        <Col xs={10}>
             <Routes>
               <Route path="/" element={<Navigate to={ currentUser ? "/Kambaz/Account/Profile" : "/Kambaz/Account/Signin" }/>}/>
               <Route path="/Signin" element={<Signin />} />

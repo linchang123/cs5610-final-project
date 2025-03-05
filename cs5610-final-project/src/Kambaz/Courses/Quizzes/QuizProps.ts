@@ -19,4 +19,5 @@ export default interface quizProps {
     webcamRequired: boolean;
     lockQAfterAnswer: boolean;
     published: boolean;
+    newQuiz: boolean;
 };

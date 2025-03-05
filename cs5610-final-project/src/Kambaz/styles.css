@@ -5,6 +5,10 @@ body * {  font-family: Arial, Helvetica, sans-serif;  }
   #wd-kambaz .wd-main-content-offset {
     padding-left: 140px !important;
   }
+
+  #wd-quiz-allowed-attempts {
+    top: 27%;
+  }
 }
 
 @media (max-width: 1400px) {
@@ -21,6 +25,7 @@ body * {  font-family: Arial, Helvetica, sans-serif;  }
     left: 15%;
   } */
   
+
   #wd-quiz-detail-availability-table {
     padding: 0 !important;
   }

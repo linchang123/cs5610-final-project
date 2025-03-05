@@ -32,7 +32,8 @@ export default function QuizDetails() {
                     oneQAtATime={q.oneQAtATime} 
                     webcamRequired={q.webcamRequired} 
                     lockQAfterAnswer={q.lockQAfterAnswer}
-                    published={q.published}/>
+                    published={q.published}
+                    newQuiz={false}/>
             );
         }
     }

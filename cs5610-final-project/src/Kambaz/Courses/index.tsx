@@ -38,7 +38,7 @@ export default function Courses() {
                 <Route path="People" element={<PeopleTable />} />
                 <Route path="Quizzes" element={<Quizzes/>}/>
                 <Route path="Quizzes/:qid" element={<FacultyFeatures><QuizDetails/></FacultyFeatures>}/>
-                <Route path="Quizzes/:qid/Editor" element={<FacultyFeatures><QuizDetailsEditor/></FacultyFeatures>} />
+                <Route path="Quizzes/:qid/Editor/*" element={<FacultyFeatures><QuizDetailsEditor/></FacultyFeatures>} />
                 </Routes>
             </div>
         </div>

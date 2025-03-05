@@ -1,4 +1,4 @@
-import { FormGroup, FormLabel, FormControl, FormSelect, Row, Col } from "react-bootstrap";
+import { FormGroup, FormLabel, FormControl, FormSelect, Row, Col, Form } from "react-bootstrap";
 import { useParams } from "react-router";
 import { addAssignment, updateAssignment } from "./reducer";
 import { useDispatch, useSelector } from "react-redux";
@@ -86,11 +86,11 @@ const Editor = ( {
             <FormControl className="my-3 w-75 form-control" as="textarea" id="wd-description" value={assignmentData.description} onChange={(e) => setAssignmentData({...assignmentData, description: e.target.value})} rows={5} />
         </FormGroup>
         <Row>
-            <Col xs={3} className="text-end"><label htmlFor="wd-points">Points</label></Col>
+            <Col xs={3} className="text-end mt-1"><label htmlFor="wd-points">Points</label></Col>
             <Col xs={9}><input style={{width: "67%"}} type="number" id="wd-points" value={assignmentData.points} onChange={(e) => setAssignmentData({...assignmentData, points: parseInt(e.target.value)})} className="form-control"/></Col>
         </Row>
         <Row className="mt-3">
-            <Col xs={3} className="text-end"><label htmlFor="wd-group">Assignment Group</label></Col>
+            <Col xs={3} className="text-end mt-1"><label htmlFor="wd-group">Assignment Group</label></Col>
             <Col xs={9} >
                 <FormSelect className="form-control" id="wd-group" style={{width: "67%"}}>
                     <option value="QUIZZES">QUIZZES</option>
@@ -101,7 +101,7 @@ const Editor = ( {
             </Col>
         </Row>
         <Row className="mt-3">
-            <Col xs={3} className="text-end"><label htmlFor="wd-display-grade-as">Display Grade as</label></Col>
+            <Col xs={3} className="text-end mt-1"><label htmlFor="wd-display-grade-as">Display Grade as</label></Col>
             <Col xs={9} >
                 <FormSelect className="form-control" id="wd-display-grade-as" style={{width: "67%"}}>
                     <option value="No Selection">No Selection</option>
@@ -110,7 +110,7 @@ const Editor = ( {
             </Col>
         </Row>
         <Row className="mt-3">
-            <Col xs={3} className="text-end"><label htmlFor="wd-submission-type">Submission Type</label></Col>
+            <Col xs={3} className="text-end mt-1"><label htmlFor="wd-submission-type">Submission Type</label></Col>
             <Col xs={9} className="border border-dark border-opacity-25 rounded" style={{width: "50%"}}>
                 <FormSelect id="wd-submission-type" className="position-relative form-control" style={{top: "8px"}}>
                     <option value="No Selection">No Selection</option>
@@ -149,7 +149,7 @@ const Editor = ( {
             </Col>
         </Row>
         <Row className="mt-3 mb-5">
-            <Col xs={3} className="text-end"><label>Assign</label></Col>
+            <Col xs={3} className="text-end mt-1"><label>Assign</label></Col>
             <Col xs={9} className="border border-dark border-opacity-25 rounded" style={{width: "50%"}}>
                 <label className="pt-3" htmlFor="wd-assign-to">Assign to</label>
                 <FormSelect id="wd-assign-to" className="position-relative form-control" style={{top: "8px"}}>
@@ -158,22 +158,19 @@ const Editor = ( {
                 </FormSelect>
                 <label className="pt-4" htmlFor="wd-due-date">Due</label><br/>
                 <input type="date" className="w-100 rounded form-control" value={assignmentData.dueDate} onChange={(e) => setAssignmentData({...assignmentData, dueDate: e.target.value})} id="wd-due-date"/><br/>
-                <div className="my-3">
+                <div id="wd-css-responsive-forms-1">
                     <Row>
-                        <Col>
-                            <label htmlFor="wd-available-from">Available From</label>
+                        <Col md={6} xs={12} className="mb-3">
+                            <Form.Group controlId="availableFromDate">
+                                <Form.Label htmlFor="wd-available-from">Available From</Form.Label>
+                                <Form.Control type="date" value={assignmentData.availableFromDate} onChange={(e) => setAssignmentData({...assignmentData, availableFromDate: e.target.value})} id="wd-available-from" />
+                            </Form.Group>
                         </Col>
-                        <Col>
-                            <label htmlFor="wd-available-until">Until</label>
-                        </Col>
-                        
-                    </Row>
-                    <Row>
-                        <Col>
-                            <input className="w-100 rounded form-control" type="date" value={assignmentData.availableFromDate} onChange={(e) => setAssignmentData({...assignmentData, availableFromDate: e.target.value})} id="wd-available-from"/>
-                        </Col>
-                        <Col>
-                            <input className="w-100 rounded form-control" type="date" value={assignmentData.availableTilDate} onChange={(e) => setAssignmentData({...assignmentData, availableTilDate: e.target.value})} id="wd-available-until"/>
+                        <Col md={6} xs={12} className="mb-3">
+                            <Form.Group controlId="untilDate">
+                                <Form.Label htmlFor="wd-available-until">Until</Form.Label>
+                                <Form.Control type="date" value={assignmentData.availableTilDate} onChange={(e) => setAssignmentData({...assignmentData, availableTilDate: e.target.value})} id="wd-available-until" />
+                            </Form.Group>
                         </Col>
                     </Row>
                 </div>
