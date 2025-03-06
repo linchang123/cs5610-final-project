@@ -1,18 +1,9 @@
-import { useDispatch, useSelector } from "react-redux";
 import quizProps from "./QuizProps";
-import { useNavigate, useParams } from "react-router-dom";
-import { useState } from "react";
 import { Col, Form, FormControl, FormGroup, FormLabel, FormSelect, Row } from "react-bootstrap";
 import TextEditor from "../utility/TextEditor";
-import { addQuiz, deleteQuiz, updateQuiz } from "./reducer";
-import QuizDetails from "./Details";
 
-export default function DetailsEditorTab({quiz}: {quiz: quizProps}) {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const {cid, qid} = useParams();
-    const [quizData, setQuizData] = useState<quizProps>(() => ({...quiz}));
-    const { quizzes } = useSelector((state: any) => state.quizzesReducer); 
+export default function DetailsEditorTab({quizData, setQuizData}: {quizData: any; setQuizData: (q:any) => void}) {
+    
     const quizTypeOptions = ["Graded Quiz", "Practice Quiz", "Graded Survey", "Ungraded Survey"];
     const assignmentGroupOptions = ["QUIZZES", "ASSIGNMENTS", "EXAMS", "PROJECT"];
     let options : { [label: string]: keyof quizProps } = {"Shuffle Answers": "shuffleAnswers", 
@@ -20,23 +11,6 @@ export default function DetailsEditorTab({quiz}: {quiz: quizProps}) {
                   "One Question at a Time": "oneQAtATime", 
                   "Webcam Required": "webcamRequired", 
                   "Lock Questions After Answering": "lockQAfterAnswer"};
-    const handleSave = () => {
-        const quiz = {
-            _id: qid, title: quizData.quizTitle, course: cid, dueDate: quizData.quizDue,
-            availableFromDate: quizData.quizAvailableFrom, availableTilDate: quizData.quizAvailableTil,
-            points: quizData.quizPoints, numQuestions: quizData.quizNumQuestions, quizType: quizData.quizType,
-            assignmentGroup: quizData.assignmentGroup, shuffleAnswers: quizData.shuffleAnswers, timeLimit: quizData.timeLimit,
-            multipleAttempts: quizData.multipleAttempts, attempts: quizData.attempts, showCorrectAnswers: quizData.showCorrectAnswers,
-            accessCode: quizData.accessCode, oneQAtATime: quizData.oneQAtATime, webcamRequired: quizData.webcamRequired,
-            lockQAfterAnswer: quizData.lockQAfterAnswer, published: quizData.published, description: quizData.quizDetails
-        };
-        if (quizData.newQuiz) {
-            dispatch(addQuiz(quiz))
-        } else {
-            dispatch(updateQuiz(quiz))
-        }
-        navigate(quizData.quizURL);
-    }
     return (
         <div id="wd-quiz-editor-details-tab">
             {/* {Object.entries(quizData).map(([key, val] : [key: string, val: any]) => (
@@ -93,11 +67,11 @@ export default function DetailsEditorTab({quiz}: {quiz: quizProps}) {
                                 onChange={(e) => setQuizData({...quizData, attempts: parseInt(e.target.value) })}/>
                             </Form.Group>
                         )}
-                        <Form.Check className="me-3 mt-2" label={"Time Limit"} checked={quizData.timeLimit < Infinity}
+                        <Form.Check className="me-3 mt-2" label={"Time Limit"} checked={quizData.timeLimit < Infinity || quizData.timeLimit == undefined}
                         onChange={(e) => setQuizData({...quizData, timeLimit: (e.target as HTMLInputElement).checked ? 20: Infinity })}/>
                         {(quizData.timeLimit < Infinity) && (
                             <Form.Group className="ms-3 d-flex align-items-center">
-                                <Form.Control className="w-25 mt-1" defaultValue={quizData.timeLimit} onChange={(e) => setQuizData({...quizData, timeLimit: parseInt(e.target.value) })}/>
+                                <Form.Control className="w-25 mt-1" defaultValue={quizData.timeLimit} onChange={(e) => setQuizData({...quizData, timeLimit: parseInt(e.target.value) || 0 })}/>
                                 <Form.Label className="m-0 ms-2">Minutes</Form.Label>
                             </Form.Group>
                         )}
@@ -134,11 +108,7 @@ export default function DetailsEditorTab({quiz}: {quiz: quizProps}) {
                     </div>
                 </Col>
             </Row>
-            <hr/>
-            <div className="mt-3 text-end" style={{width: "76%"}}>
-                <button onClick={() => {navigate(`/Kambaz/Courses/${cid}/Quizzes`)}} className="btn btn-lg btn-secondary me-2">Cancel</button>
-                <button onClick={handleSave} className="btn btn-lg btn-danger">Save</button>
-            </div>
+            
             </div>
     );
 }

@@ -3,15 +3,16 @@ import { Row, Col, Dropdown } from "react-bootstrap";
 import { IoEllipsisVertical } from "react-icons/io5";
 import GreenCheckMark from "../utility/GreenCheckMark";
 import formatDate from "../utility/formatDate";
-import { useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import { RxRocket } from "react-icons/rx";
 import { FaMagnifyingGlass, FaPlus } from "react-icons/fa6";
 import FacultyFeatures from "../../Account/FacultyFeatures";
 import { useState } from "react";
 import { v4 as uuidv } from "uuid";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import { AiOutlineStop } from "react-icons/ai";
+import { deleteQuiz, publishQuiz } from "./reducer";
 
 export default function Quizzes() {
     const { cid } = useParams();
@@ -45,7 +46,13 @@ export default function Quizzes() {
 }
 
 const QuizList = ({quizzes, cid}:{quizzes: any; cid: string}) => {
-    let currCourseQuiz = quizzes.filter((quiz: any) => quiz.course === cid);
+    let currCourseQuiz = [];
+    const { currentUser } = useSelector((state: any) => state.accountReducer); 
+    if (currentUser.role === "FACULTY") {
+        currCourseQuiz = quizzes.filter((quiz: any) => quiz.course === cid);
+    } else {
+        currCourseQuiz = quizzes.filter((quiz: any) => (quiz.course === cid && quiz.published == true));
+    }
     if (currCourseQuiz.length > 0) {
         return (
             <div id="wd-quiz-list">
@@ -59,25 +66,30 @@ const QuizList = ({quizzes, cid}:{quizzes: any; cid: string}) => {
                     quizURL={"#/Kambaz/Courses/" + cid + "/Quizzes/" + quiz._id}
                     // quizDetails=""
                     published={quiz.published}
+                    quizId={quiz._id}
                     quizNumQuestions={quiz.numQuestions}
-                    // quizAvailableFrom={quiz.availableFromDate}
-                    // quizAvailableTil={quiz.availableTilDate}
+                    quizAvailableFrom={quiz.availableFromDate}
+                    quizAvailableTil={quiz.availableTilDate}
                     quizPoints={quiz.points}/>))}
                 </ul>
             </div>
         );
     } else {
-        return (<h3 className="text-center text-secondary">Click on "+ Quiz" button to add new quiz</h3>);
+        return (<FacultyFeatures><h3 className="text-center text-secondary">Click on "+ Quiz" button to add new quiz</h3></FacultyFeatures>);
     }
 }
 
-const Quiz = ({quizTitle, quizDue, quizURL, quizPoints, quizNumQuestions, published
-            //    quizAvailableFrom, quizAvailableTil
+const Quiz = ({quizTitle, quizDue, quizURL, quizPoints, quizNumQuestions, published, quizId,
+               quizAvailableFrom, quizAvailableTil
             }: {
         quizTitle: string; quizDue: string; quizURL: string; quizPoints: number; quizNumQuestions:number;
-        published: boolean
-        // quizAvailableFrom: string; quizAvailableTil: string
+        published: boolean; quizId: string; quizAvailableFrom: string; quizAvailableTil: string
     }) => {
+        const dispatch = useDispatch();
+        const navigate = useNavigate();
+        const handlePublishSymbolClick = () => {dispatch(publishQuiz(quizId))};
+        const handleDeleteButtonClick = () => {dispatch(deleteQuiz(quizId))};
+        const handleEditButtonClick = () => {navigate(`${quizId}/Editor`)};
     return (
         <li className="wd-quiz-list-item list-group-item p-3 ps-1 d-flex align-items-center">
              <RxRocket className="m-2 fs-3 "style={{minWidth: "30px"}}/>
@@ -87,23 +99,24 @@ const Quiz = ({quizTitle, quizDue, quizURL, quizPoints, quizNumQuestions, publis
                   {quizTitle}
                  </a> 
                  <p className="m-0">
-                     <span className="fw-bold">Due</span> {quizDue} | {quizPoints}pts | {quizNumQuestions} questions
+                    <span className="me-1"><QuizAvailability quizAvailableFrom={quizAvailableFrom} quizAvailableTil={quizAvailableTil}/></span> |
+                     <span className="fw-bold mx-1">Due</span> {quizDue} | {quizPoints}pts | {quizNumQuestions} questions
                  </p>
 
              </div>
              <FacultyFeatures>
                 <div className="d-flex align-items-center ms-3" style={{minWidth: "120px"}}>
                     <Row>
-                        <Col>{published? <GreenCheckMark/>: <AiOutlineStop className="fs-2"/>}</Col>
+                        <Col><span onClick={handlePublishSymbolClick}>{published? <GreenCheckMark/>: <AiOutlineStop className="fs-2"/>}</span></Col>
                         <Col>
                             <Dropdown className="float-end me-2">
                                 <Dropdown.Toggle id="wd-quiz-context-menu-btn" bsPrefix="btn" className="text-dark border-0 bg-transparent">
                                     <IoEllipsisVertical className="fs-4" />
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
-                                    <Dropdown.Item id="wd-quiz-menu-edit-option">Edit</Dropdown.Item>
-                                    <Dropdown.Item id="wd-quiz-menu-delete-option">Delete</Dropdown.Item>
-                                    <Dropdown.Item id="wd-quiz-menu-publish-option">Publish</Dropdown.Item>
+                                    <Dropdown.Item onClick={handleEditButtonClick} id="wd-quiz-menu-edit-option">Edit</Dropdown.Item>
+                                    <Dropdown.Item id="wd-quiz-menu-delete-option" onClick={handleDeleteButtonClick}>Delete</Dropdown.Item>
+                                    <Dropdown.Item onClick={handlePublishSymbolClick} id="wd-quiz-menu-publish-option">Publish</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                         </Col>
@@ -114,3 +127,15 @@ const Quiz = ({quizTitle, quizDue, quizURL, quizPoints, quizNumQuestions, publis
     );
 };
 
+const QuizAvailability = ({quizAvailableFrom, quizAvailableTil} : {quizAvailableFrom: string, quizAvailableTil: string}) => {
+    const availableFrom = new Date(quizAvailableFrom + " 12:00:00");
+    const availableTil = new Date(quizAvailableTil + " 12:00:00");
+    const currDate = new Date(); 
+    if (availableTil < currDate) {
+        return(<strong>Closed</strong>);
+    } else if (availableFrom <= currDate && currDate <= availableTil) {
+        return(<strong>Available</strong>)
+    } else if (currDate < availableFrom) {
+        return(<span><strong>Not Available until </strong>{formatDate(quizAvailableFrom)}</span>)
+    }
+}

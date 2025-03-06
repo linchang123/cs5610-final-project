@@ -1,12 +1,14 @@
 import { IoEllipsisVertical } from "react-icons/io5";
-import { useSelector } from "react-redux";
-import { Link, Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import quizProps from "./QuizProps";
 import GreenCheckmark from "../utility/GreenCheckMark";
 import { AiOutlineStop } from "react-icons/ai";
 import { Nav } from "react-bootstrap";
 import DetailsEditorTab from "./DetailsEditorTab";
 import QuestionsEditorTab from "./QuestionsEditorTab";
+import { useState } from "react";
+import { addQuiz, updateQuiz } from "./reducer";
 
 export default function QuizDetailsEditor() {
     const { cid, qid } = useParams();
@@ -37,7 +39,7 @@ export default function QuizDetailsEditor() {
                 published: q.published,
                 newQuiz: false
             }
-            return (<Editor quiz={currQuiz} />);
+            return (<Editor quiz={currQuiz} cid={cid ? cid : ""} qid={qid ? qid : ""}/>);
         }
     }
     currQuiz = {
@@ -64,12 +66,45 @@ export default function QuizDetailsEditor() {
         newQuiz: true
     }
     return (
-        <Editor quiz={currQuiz}/>
+        <Editor quiz={currQuiz} cid={cid ? cid : ""} qid={qid ? qid : ""}/>
     );
 }
 
-const Editor = ({quiz}: {quiz: quizProps}) => {
+const Editor = ({quiz, qid, cid}: {quiz: quizProps, qid: string, cid: string}) => {
         const { pathname } = useLocation();
+        const dispatch = useDispatch();
+        const navigate = useNavigate();
+        const [quizData, setQuizData] = useState<quizProps>(() => ({...quiz}));
+        const handleSave = () => {
+                const quiz = {
+                    _id: qid, title: quizData.quizTitle, course: cid, dueDate: quizData.quizDue,
+                    availableFromDate: quizData.quizAvailableFrom, availableTilDate: quizData.quizAvailableTil,
+                    points: quizData.quizPoints, numQuestions: quizData.quizNumQuestions, quizType: quizData.quizType,
+                    assignmentGroup: quizData.assignmentGroup, shuffleAnswers: quizData.shuffleAnswers, timeLimit: quizData.timeLimit,
+                    multipleAttempts: quizData.multipleAttempts, attempts: quizData.attempts, showCorrectAnswers: quizData.showCorrectAnswers,
+                    accessCode: quizData.accessCode, oneQAtATime: quizData.oneQAtATime, webcamRequired: quizData.webcamRequired,
+                    lockQAfterAnswer: quizData.lockQAfterAnswer, published: quizData.published, description: quizData.quizDetails
+                };
+                if (quizData.newQuiz) {
+                    dispatch(addQuiz(quiz))
+                } else {
+                    dispatch(updateQuiz(quiz))
+                }
+                navigate(quizData.quizURL);
+            }
+            const handleSaveAndPublish = () => {
+                const quiz = {
+                    _id: qid, title: quizData.quizTitle, course: cid, dueDate: quizData.quizDue,
+                    availableFromDate: quizData.quizAvailableFrom, availableTilDate: quizData.quizAvailableTil,
+                    points: quizData.quizPoints, numQuestions: quizData.quizNumQuestions, quizType: quizData.quizType,
+                    assignmentGroup: quizData.assignmentGroup, shuffleAnswers: quizData.shuffleAnswers, timeLimit: quizData.timeLimit,
+                    multipleAttempts: quizData.multipleAttempts, attempts: quizData.attempts, showCorrectAnswers: quizData.showCorrectAnswers,
+                    accessCode: quizData.accessCode, oneQAtATime: quizData.oneQAtATime, webcamRequired: quizData.webcamRequired,
+                    lockQAfterAnswer: quizData.lockQAfterAnswer, published: true, description: quizData.quizDetails
+                }; 
+                dispatch(updateQuiz(quiz));
+                navigate(`/Kambaz/Courses/${cid}/Quizzes`);
+            }
     return (
         <div id="wd-quiz-detail-editor">
             <div id="wd-quiz-detail-editor-header" className="d-flex flex-row-reverse align-items-center">
@@ -94,9 +129,15 @@ const Editor = ({quiz}: {quiz: quizProps}) => {
             <div id="wd-quiz-detail-editor-body">
                 <Routes>
                     <Route path="/" element={<Navigate to="Details" />} />
-                    <Route path="Details" element={<DetailsEditorTab quiz={quiz}/>}/>
+                    <Route path="Details" element={<DetailsEditorTab quizData={quizData} setQuizData={setQuizData}/>}/>
                     <Route path="Questions" element={<QuestionsEditorTab/>}/>
                 </Routes>
+            </div>
+            <hr/>
+            <div className="mt-3 position-relative text-end text-nowrap" style={{width: "76%", left: "10%"}}>
+                <button onClick={() => {navigate(`/Kambaz/Courses/${cid}/Quizzes`)}} className="btn btn-md btn-secondary me-3">Cancel</button>
+                <button onClick={handleSave} className="btn btn-md btn-danger">Save</button>
+                <button onClick={handleSaveAndPublish} className="btn btn-md btn-success ms-3">Save and Publish</button>
             </div>
         </div>
     );
