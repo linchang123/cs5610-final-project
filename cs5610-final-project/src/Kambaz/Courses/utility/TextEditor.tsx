@@ -6,15 +6,15 @@
 import Editor from 'react-simple-wysiwyg';
 import quizProps from '../Quizzes/QuizProps';
     
-export default function TextEditor({quiz, setQuizData}: {quiz: quizProps; setQuizData: (quiz: quizProps) => void}) {
+export default function TextEditor({object, setObjectData, field}: {object: any; setObjectData: (object: any) => void; field: string}) {
     // const [html, setHtml] = useState('my <b>HTML</b>');
     
     function onChange(e: { target: { value: any; }; }) {
     // setHtml(e.target.value);
-    setQuizData({...quiz, quizDetails: e.target.value})
+    setObjectData({...object, [field]: e.target.value})
     }
 
     return (
-    <Editor containerProps={{ style: { height: "150px" } }} value={quiz.quizDetails} onChange={onChange} />
+    <Editor containerProps={{ style: { height: "150px", margin: "10px" } }} value={object[field]} onChange={onChange} />
     );
 }

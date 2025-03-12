@@ -19,7 +19,7 @@ export default function DetailsEditorTab({quizData, setQuizData}: {quizData: any
             <FormGroup >
                 <FormControl className="w-75 form-control mt-3" id="wd-quiz-editor-details-quiz-title" value={quizData.quizTitle} onChange={(e) => setQuizData({...quizData, quizTitle: e.target.value})}/>
                 <FormLabel className="mt-3 w-75">Quiz Instructions: </FormLabel>
-                <div className="w-75"><TextEditor quiz={quizData} setQuizData={setQuizData}/></div>
+                <div className="w-75 position-relative" style={{right: "8px"}}><TextEditor object={quizData} setObjectData={setQuizData} field={"quizDetails"}/></div>
             </FormGroup>
             <Row className="mt-3">
                 <Col xs={3} className="text-end mt-1"><label htmlFor="wd-points">Points</label></Col>
