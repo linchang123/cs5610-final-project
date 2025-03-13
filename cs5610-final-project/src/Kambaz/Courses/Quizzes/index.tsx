@@ -3,7 +3,7 @@ import { Row, Col, Dropdown } from "react-bootstrap";
 import { IoEllipsisVertical } from "react-icons/io5";
 import GreenCheckMark from "../utility/GreenCheckMark";
 import formatDate from "../utility/formatDate";
-import { Link, useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { RxRocket } from "react-icons/rx";
 import { FaMagnifyingGlass, FaPlus } from "react-icons/fa6";
 import FacultyFeatures from "../../Account/FacultyFeatures";
@@ -12,7 +12,8 @@ import { v4 as uuidv } from "uuid";
 import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import { AiOutlineStop } from "react-icons/ai";
-import { deleteQuiz, publishQuiz } from "./reducer";
+import { deleteQuiz, publishQuiz } from "./reducers/reducer";
+import "../../styles.css";
 
 export default function Quizzes() {
     const { cid } = useParams();
@@ -62,7 +63,7 @@ const QuizList = ({quizzes, cid}:{quizzes: any; cid: string}) => {
                 </div>
                 <ul id="wd-quiz-list" className="list-group rounded-0">
                 {currCourseQuiz.map((quiz: any) => (
-                    <Quiz quizTitle={quiz.title}  quizDue={formatDate(quiz.dueDate) + " at 11:59pm"}
+                    <Quiz quizTitle={quiz.title}  quizDue={formatDate(quiz.dueDate)}
                     quizURL={"#/Kambaz/Courses/" + cid + "/Quizzes/" + quiz._id}
                     // quizDetails=""
                     published={quiz.published}
@@ -110,13 +111,13 @@ const Quiz = ({quizTitle, quizDue, quizURL, quizPoints, quizNumQuestions, publis
                         <Col><span onClick={handlePublishSymbolClick}>{published? <GreenCheckMark/>: <AiOutlineStop className="fs-2"/>}</span></Col>
                         <Col>
                             <Dropdown className="float-end me-2">
-                                <Dropdown.Toggle id="wd-quiz-context-menu-btn" bsPrefix="btn" className="text-dark border-0 bg-transparent">
+                                <Dropdown.Toggle id="wd-quiz-context-menu-btn" bsPrefix="btn" >
                                     <IoEllipsisVertical className="fs-4" />
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                     <Dropdown.Item onClick={handleEditButtonClick} id="wd-quiz-menu-edit-option">Edit</Dropdown.Item>
                                     <Dropdown.Item id="wd-quiz-menu-delete-option" onClick={handleDeleteButtonClick}>Delete</Dropdown.Item>
-                                    <Dropdown.Item onClick={handlePublishSymbolClick} id="wd-quiz-menu-publish-option">Publish</Dropdown.Item>
+                                    <Dropdown.Item onClick={handlePublishSymbolClick} id="wd-quiz-menu-publish-option">{published ? "Unpublish" : "Publish"}</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                         </Col>
@@ -128,8 +129,8 @@ const Quiz = ({quizTitle, quizDue, quizURL, quizPoints, quizNumQuestions, publis
 };
 
 const QuizAvailability = ({quizAvailableFrom, quizAvailableTil} : {quizAvailableFrom: string, quizAvailableTil: string}) => {
-    const availableFrom = new Date(quizAvailableFrom + " 12:00:00");
-    const availableTil = new Date(quizAvailableTil + " 12:00:00");
+    const availableFrom = new Date(quizAvailableFrom);
+    const availableTil = new Date(quizAvailableTil);
     const currDate = new Date(); 
     if (availableTil < currDate) {
         return(<strong>Closed</strong>);

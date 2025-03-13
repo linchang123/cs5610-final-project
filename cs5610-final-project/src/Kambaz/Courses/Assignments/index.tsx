@@ -40,8 +40,8 @@ export default function Assignments() {
           .filter((assignment: any) => assignment.course === cid)
           .map((assignment: any) => (
             <Assignment assignmentTitle={assignment.title} assignmentId={assignment._id}
-            assignmentAvailable={formatDate(assignment.availableFromDate) + " at 12:00am"} 
-            assignmentDue={formatDate(assignment.dueDate) + " at 11:59pm"}
+            assignmentAvailable={formatDate(assignment.availableFromDate)} 
+            assignmentDue={formatDate(assignment.dueDate)}
             assignmentURL={"#/Kambaz/Courses/" + cid + "/Assignments/" + assignment._id}
             assignmentPoints={assignment.points}
             assignmentTilDate={assignment.availableTilDate}

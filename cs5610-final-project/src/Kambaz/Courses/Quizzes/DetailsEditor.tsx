@@ -8,7 +8,7 @@ import { Nav } from "react-bootstrap";
 import DetailsEditorTab from "./DetailsEditorTab";
 import QuestionsEditorTab from "./QuestionsEditorTab";
 import { useState } from "react";
-import { addQuiz, updateQuiz } from "./reducer";
+import { addQuiz, updateQuiz } from "./reducers/reducer";
 
 export default function QuizDetailsEditor() {
     const { cid, qid } = useParams();
@@ -102,7 +102,11 @@ const Editor = ({quiz, qid, cid}: {quiz: quizProps, qid: string, cid: string}) =
                     accessCode: quizData.accessCode, oneQAtATime: quizData.oneQAtATime, webcamRequired: quizData.webcamRequired,
                     lockQAfterAnswer: quizData.lockQAfterAnswer, published: true, description: quizData.quizDetails
                 }; 
-                dispatch(updateQuiz(quiz));
+                if (quizData.newQuiz) {
+                    dispatch(addQuiz(quiz))
+                } else {
+                    dispatch(updateQuiz(quiz))
+                }
                 navigate(`/Kambaz/Courses/${cid}/Quizzes`);
             }
     return (

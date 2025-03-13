@@ -1,21 +1,23 @@
-import { JSXElementConstructor, ReactElement, ReactNode, ReactPortal, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { Col, Form, FormControl, FormGroup, FormLabel, FormSelect, Row } from "react-bootstrap";
+import { useState } from "react";
+import { Col, Form,FormSelect, Row} from "react-bootstrap";
 import TextEditor from "../utility/TextEditor";
+import { FaPlus } from "react-icons/fa6";
 
-export default function QuestionEditor() {
+export default function QuestionEditor({question}:{question: any}) {
     const questionType = ["Multiple Choice", "True/False", "Fill In the Blank"];
     const [questionData, setQuestionData] = useState({
-        _id: uuidv4(),
-        title: "New Question",
-        points: 0,
-        questionType: "Multiple Choice",
-        prompt: "",
-        possibleAnswers: [],
-        acceptedAnswers: []
+        _id: question._id,
+        title: question.title,
+        points: question.points,
+        questionType: question.questionType,
+        prompt: question.prompt,
+        possibleAnswers: question.possibleAnswers,
+        acceptedAnswers: question.acceptedAnswers,
+        course: question.course,
+        quiz: question.quiz
     });
     return (
-        <div className="w-75 border">
+        <div className="w-100 border border-secondary my-5">
             <Form>
                 <div className="float-end m-3">
                     <Form.Group className="d-flex align-items-center" style={{width: "80px"}}>
@@ -42,7 +44,58 @@ export default function QuestionEditor() {
             <h5 className="text-start m-3 fw-bold">Question: </h5>
             <TextEditor object={questionData} setObjectData={setQuestionData} field="prompt"/>
             <h5 className="text-start m-3 fw-bold">Answers: </h5>
-            
+            <AnswerGroup question={questionData}/>
+            <button id="wd-quiz-add-another-answer-btn" className="text-center btn text-danger"><FaPlus className="mb-1 me-1"/>Add Another Answer</button>
+            <br/><br/>
+            <QuestionControlButtons/>
+        </div>
+    );
+}
+
+function AnswerGroup({question}:{question: any}) {
+    const questionType = question.questionType;
+    const possibleAnswers = question.possibleAnswers;
+    const acceptedAnswers = question.acceptedAnswers;
+    let answers = null;
+    if (questionType === "Multiple Choice") {
+        if (possibleAnswers.length > 0) {
+            answers = possibleAnswers.map((a: string) => (
+            <Form.Group className="mb-3 d-flex align-items-center" controlId="answer">
+                <Form.Label className="me-3 mb-1">Possible Answer:</Form.Label>
+                <Form.Control className="w-50" value={a} />
+            </Form.Group>));
+        }
+    } else if (questionType === "True/False") {
+        answers = ["True", "False"].map((a: string) => (
+            <Form.Group className="mb-3 d-flex align-items-center">
+                <Form.Check type="radio" label={a} name="true/false"/>
+            </Form.Group>
+        ));
+    } else {
+        if (acceptedAnswers.length > 0) {
+            answers = acceptedAnswers.map((a: string) => (
+                <Form.Group className="mb-3 d-flex align-items-center" controlId="answer">
+                    <Form.Label className="me-3 mb-1">Possible Answer:</Form.Label>
+                    <Form.Control className="w-50" value={a} />
+                </Form.Group>));
+        }
+    }
+    if (!answers){
+        answers = (
+        <Form.Group className="mb-3 d-flex align-items-center" controlId="answer">
+            <Form.Label className="me-3 mb-1">Possible Answer</Form.Label>
+            <Form.Control className="w-50" value="" />
+        </Form.Group>)
+    }
+    return (<div id="wd-quiz-question-answer-group" className="text-center d-flex flex-column align-items-center">{answers}</div>);
+}
+
+
+function QuestionControlButtons() {
+    return(
+        <div className="float-start m-3">
+            <button>Cancel</button>
+            <button>Save Question</button>
         </div>
     );
 }

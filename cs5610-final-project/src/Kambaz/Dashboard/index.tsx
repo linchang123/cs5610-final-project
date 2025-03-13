@@ -2,8 +2,8 @@ import {useState} from "react";
 import { Link } from "react-router-dom";
 import {Row, Col, Card} from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
-import { addCourse, updateCourse, deleteCourse } from "./courseReducer";
-import { addEnrollment, deleteEnrollment } from "./enrollmentReducer";
+import { addCourse, updateCourse, deleteCourse } from "./coursesReducer";
+import { addEnrollment, deleteEnrollment } from "./enrollmentsReducer";
 import { v4 as uuidv4 } from "uuid";
 import FacultyFeatures from "../Account/FacultyFeatures";
 

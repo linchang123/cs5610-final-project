@@ -59,3 +59,18 @@ body * {  font-family: Arial, Helvetica, sans-serif;  }
     gap: 5%;
     margin: 0 5%;
 }
+
+#wd-quiz-context-menu-btn {
+  background-color: transparent !important;
+  color: black !important; 
+  border: none !important;
+  margin: 1% 0;
+}
+
+#wd-quiz-context-menu-btn:hover,
+#wd-quiz-context-menu-btn:focus,
+#wd-quiz-context-menu-btn:active {
+  background-color: dimgray !important;
+  color: white !important;
+}
+

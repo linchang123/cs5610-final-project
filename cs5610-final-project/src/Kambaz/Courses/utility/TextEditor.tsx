@@ -4,7 +4,6 @@
     */}
 
 import Editor from 'react-simple-wysiwyg';
-import quizProps from '../Quizzes/QuizProps';
     
 export default function TextEditor({object, setObjectData, field}: {object: any; setObjectData: (object: any) => void; field: string}) {
     // const [html, setHtml] = useState('my <b>HTML</b>');
@@ -15,6 +14,6 @@ export default function TextEditor({object, setObjectData, field}: {object: any;
     }
 
     return (
-    <Editor containerProps={{ style: { height: "150px", margin: "10px" } }} value={object[field]} onChange={onChange} />
+    <Editor containerProps={{ style: { height: "150px", margin: "10px" } }} value={object[field]} onChange={onChange} className="text-start"/>
     );
 }

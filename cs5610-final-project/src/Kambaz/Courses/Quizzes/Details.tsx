@@ -84,10 +84,10 @@ const Details = ({quizTitle, quizURL, quizPoints, quizAvailableFrom, quizAvailab
                 </div>
                 <hr className="m-1"/>
                 <div className="d-grid grid-template-columns-4 text-start">
-                    <div className="">{formatDate(quizDue)} at 11:59pm</div>
+                    <div className="">{formatDate(quizDue)}</div>
                     <div>Everyone</div>
-                    <div>{formatDate(quizAvailableFrom)} at 11:59pm</div>
-                    <div>{formatDate(quizAvailableTil)} at 11:59pm</div>
+                    <div>{formatDate(quizAvailableFrom)}</div>
+                    <div>{formatDate(quizAvailableTil)}</div>
                 </div>
             </div>
         </div>
