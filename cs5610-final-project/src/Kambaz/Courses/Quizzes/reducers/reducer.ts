@@ -3,6 +3,7 @@ import { quizzes } from "../../../Database";
 const initialState = {
     quizzes: quizzes,
 };
+
 const quizzesSlice = createSlice({
   name: "quizzes",
   initialState,
@@ -23,9 +24,14 @@ const quizzesSlice = createSlice({
       state.quizzes = state.quizzes.map((q: any) =>
         q._id === quizId ? { ...q, published: !q.published } : q
       ) as any;
+    },
+    updateQuizTotalScore: (state, {payload: quizInfo}) => {
+      state.quizzes = state.quizzes.map( (q: any) =>
+        q._id === quizInfo._id ? {...q, points: quizInfo.points} : q
+      ) as any
     }
-  },
+  }
 });
-export const { addQuiz, deleteQuiz, updateQuiz, publishQuiz } =
+export const { addQuiz, deleteQuiz, updateQuiz, publishQuiz, updateQuizTotalScore } =
 quizzesSlice.actions;
 export default quizzesSlice.reducer;

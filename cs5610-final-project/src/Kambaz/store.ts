@@ -18,4 +18,5 @@ const store = configureStore({
     questionsReducer
   },
 });
+
 export default store;

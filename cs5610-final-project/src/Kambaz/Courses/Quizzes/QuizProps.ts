@@ -1,12 +1,13 @@
 export default interface quizProps {
-    quizTitle: string;
+    _id: string,
+    title: string;
     quizURL: string;
-    quizPoints: number;
-    quizAvailableFrom: string;
-    quizAvailableTil: string;
-    quizDue: string;
-    quizDetails: string;
-    quizNumQuestions: number;
+    points: number;
+    availableFromDate: string;
+    availableTilDate: string;
+    dueDate: string;
+    description: string;
+    numQuestions: number;
     quizType: string;
     assignmentGroup: string;
     shuffleAnswers: boolean;
@@ -20,4 +21,5 @@ export default interface quizProps {
     lockQAfterAnswer: boolean;
     published: boolean;
     newQuiz: boolean;
+    course: string;
 };

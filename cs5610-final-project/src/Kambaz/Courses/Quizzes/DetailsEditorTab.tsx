@@ -1,9 +1,13 @@
 import quizProps from "./QuizProps";
 import { Col, Form, FormControl, FormGroup, FormLabel, FormSelect, Row } from "react-bootstrap";
 import TextEditor from "../utility/TextEditor";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { addQuiz, updateQuiz } from "./reducers/reducer";
 
 export default function DetailsEditorTab({quizData, setQuizData}: {quizData: any; setQuizData: (q:any) => void}) {
-    
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const quizTypeOptions = ["Graded Quiz", "Practice Quiz", "Graded Survey", "Ungraded Survey"];
     const assignmentGroupOptions = ["QUIZZES", "ASSIGNMENTS", "EXAMS", "PROJECT"];
     let options : { [label: string]: keyof quizProps } = {"Shuffle Answers": "shuffleAnswers", 
@@ -11,19 +15,37 @@ export default function DetailsEditorTab({quizData, setQuizData}: {quizData: any
                   "One Question at a Time": "oneQAtATime", 
                   "Webcam Required": "webcamRequired", 
                   "Lock Questions After Answering": "lockQAfterAnswer"};
+    const handleSave = () => {
+    const {newQuiz, quizURL, ...quiz} = quizData;
+    if (quizData.newQuiz) {
+        dispatch(addQuiz(quiz))
+    } else {
+        dispatch(updateQuiz(quiz))
+    }
+    navigate(quizData.quizURL);
+    }
+    const handleSaveAndPublish = () => {
+        const {newQuiz, quizURL, ...quiz} = quizData;
+        if (quizData.newQuiz) {
+            dispatch(addQuiz({...quiz, published: true}))
+        } else {
+            dispatch(updateQuiz({...quiz, published: true}))
+        }
+        navigate(`/Kambaz/Courses/${quizData.course}/Quizzes`);
+    }
     return (
         <div id="wd-quiz-editor-details-tab">
             {/* {Object.entries(quizData).map(([key, val] : [key: string, val: any]) => (
                 <p>{key}: {String(val)}</p>
             ))} */}
             <FormGroup >
-                <FormControl className="w-75 form-control mt-3" id="wd-quiz-editor-details-quiz-title" value={quizData.quizTitle} onChange={(e) => setQuizData({...quizData, quizTitle: e.target.value})}/>
+                <FormControl className="w-75 form-control mt-3" id="wd-quiz-editor-details-quiz-title" value={quizData.title} onChange={(e) => setQuizData({...quizData, title: e.target.value})}/>
                 <FormLabel className="mt-3 w-75">Quiz Instructions: </FormLabel>
-                <div className="w-75 position-relative" style={{right: "8px"}}><TextEditor object={quizData} setObjectData={setQuizData} field={"quizDetails"}/></div>
+                <div className="w-75 position-relative" style={{right: "8px"}}><TextEditor object={quizData} setObjectData={setQuizData} field={"description"}/></div>
             </FormGroup>
             <Row className="mt-3">
                 <Col xs={3} className="text-end mt-1"><label htmlFor="wd-points">Points</label></Col>
-                <Col xs={9}><input style={{width: "67%"}} type="number" id="wd-points" value={quizData.quizPoints} onChange={(e) => setQuizData({...quizData, quizPoints: parseInt(e.target.value)})} className="form-control"/></Col>
+                <Col xs={9}><input style={{width: "67%"}} type="number" id="wd-points" value={quizData.points} onChange={(e) => setQuizData({...quizData, points: parseInt(e.target.value)})} className="form-control"/></Col>
             </Row>
             <Row className="mt-3">
                 <Col xs={3} className="text-end mt-1"><label htmlFor="wd-quiz-type">Quiz Type</label></Col>
@@ -89,26 +111,31 @@ export default function DetailsEditorTab({quizData, setQuizData}: {quizData: any
                         <option selected value="Everyone">Everyone</option>
                     </FormSelect>
                     <label className="pt-4" htmlFor="wd-due-date">Due</label><br/>
-                    <input type="date" className="w-100 rounded form-control" value={quizData.quizDue} onChange={(e) => setQuizData({...quizData, quizDue: e.target.value})} id="wd-due-date"/><br/>
+                    <input type="date" className="w-100 rounded form-control" value={quizData.dueDate} onChange={(e) => setQuizData({...quizData, dueDate: e.target.value})} id="wd-due-date"/><br/>
                     <div id="wd-css-responsive-forms-1">
                         <Row>
                             <Col md={6} xs={12} className="mb-3">
                                 <Form.Group controlId="availableFromDate">
                                     <Form.Label htmlFor="wd-available-from">Available From</Form.Label>
-                                    <Form.Control type="date" value={quizData.quizAvailableFrom} onChange={(e) => setQuizData({...quizData, quizAvailableFrom: e.target.value})} id="wd-available-from" />
+                                    <Form.Control type="date" value={quizData.availableFromDate} onChange={(e) => setQuizData({...quizData, availableFromDate: e.target.value})} id="wd-available-from" />
                                 </Form.Group>
                             </Col>
                             <Col md={6} xs={12} className="mb-3">
                                 <Form.Group controlId="untilDate">
                                     <Form.Label htmlFor="wd-available-until">Until</Form.Label>
-                                    <Form.Control type="date" value={quizData.quizAvailableTil} onChange={(e) => setQuizData({...quizData, quizAvailableTil: e.target.value})} id="wd-available-until" />
+                                    <Form.Control type="date" value={quizData.availableTilDate} onChange={(e) => setQuizData({...quizData, availableTilDate: e.target.value})} id="wd-available-until" />
                                 </Form.Group>
                             </Col>
                         </Row>
                     </div>
                 </Col>
             </Row>
-            
+            <hr/>
+            <div className="mt-3 position-relative text-end text-nowrap" style={{width: "76%", left: "10%"}}>
+                <button onClick={() => {navigate(`/Kambaz/Courses/${quizData.course}/Quizzes`)}} className="btn btn-md btn-secondary me-3">Cancel</button>
+                <button onClick={handleSave} className="btn btn-md btn-danger">Save</button>
+                <button onClick={handleSaveAndPublish} className="btn btn-md btn-success ms-3">Save and Publish</button>
+            </div>
             </div>
     );
 }

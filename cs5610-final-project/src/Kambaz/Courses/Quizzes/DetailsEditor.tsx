@@ -8,7 +8,6 @@ import { Nav } from "react-bootstrap";
 import DetailsEditorTab from "./DetailsEditorTab";
 import QuestionsEditorTab from "./QuestionsEditorTab";
 import { useState } from "react";
-import { addQuiz, updateQuiz } from "./reducers/reducer";
 
 export default function QuizDetailsEditor() {
     const { cid, qid } = useParams();
@@ -17,40 +16,24 @@ export default function QuizDetailsEditor() {
     for (const q of quizzes) {
         if (q.course === cid && q._id === qid) {
             currQuiz = {
-                quizTitle: q.title,
-                quizDue: q.dueDate,
-                quizURL: "/Kambaz/Courses/" + cid + "/Quizzes/" + qid,
-                quizPoints: q.points,
-                quizAvailableFrom: q.availableFromDate,
-                quizAvailableTil: q.availableTilDate,
-                quizNumQuestions: q.numQuestions,
-                quizDetails: q.description,
-                quizType: q.quizType, 
-                assignmentGroup: q.assignmentGroup, 
-                shuffleAnswers: q.shuffleAnswers,
-                timeLimit: q.timeLimit, 
-                multipleAttempts: q.multipleAttempts, 
-                attempts: q.attempts,
-                showCorrectAnswers: q.showCorrectAnswers, 
-                accessCode: q.accessCode, 
-                oneQAtATime: q.oneQAtATime,  
-                webcamRequired: q.webcamRequired, 
-                lockQAfterAnswer: q.lockQAfterAnswer,
-                published: q.published,
-                newQuiz: false
+                ...q,
+                quizURL: `/Kambaz/Courses/${cid}/Quizzes/${qid}`,
+                newQuiz: false,
             }
-            return (<Editor quiz={currQuiz} cid={cid ? cid : ""} qid={qid ? qid : ""}/>);
+            return (<Editor quiz={currQuiz}/>);
         }
     }
     currQuiz = {
-        quizTitle: "New Quiz",
-        quizDue: "",
-        quizURL: "/Kambaz/Courses/" + cid + "/Quizzes/" + qid,
-        quizPoints: 0,
-        quizAvailableFrom: "",
-        quizAvailableTil: "",
-        quizNumQuestions: 0, 
-        quizDetails: "", 
+        _id: qid ? qid: "",
+        course: cid ? cid: "",
+        title: "New Quiz",
+        dueDate: "",
+        quizURL: `/Kambaz/Courses/${cid}/Quizzes/${qid}`,
+        points: 0,
+        availableFromDate: "",
+        availableTilDate: "",
+        numQuestions: 0, 
+        description: "", 
         quizType: "Graded Quiz", 
         assignmentGroup: "QUIZZES", 
         shuffleAnswers: true, 
@@ -65,50 +48,12 @@ export default function QuizDetailsEditor() {
         published: false,
         newQuiz: true
     }
-    return (
-        <Editor quiz={currQuiz} cid={cid ? cid : ""} qid={qid ? qid : ""}/>
-    );
+    return (<Editor quiz={currQuiz}/>);
 }
 
-const Editor = ({quiz, qid, cid}: {quiz: quizProps, qid: string, cid: string}) => {
+const Editor = ({quiz}: {quiz: quizProps}) => {
         const { pathname } = useLocation();
-        const dispatch = useDispatch();
-        const navigate = useNavigate();
         const [quizData, setQuizData] = useState<quizProps>(() => ({...quiz}));
-        const handleSave = () => {
-                const quiz = {
-                    _id: qid, title: quizData.quizTitle, course: cid, dueDate: quizData.quizDue,
-                    availableFromDate: quizData.quizAvailableFrom, availableTilDate: quizData.quizAvailableTil,
-                    points: quizData.quizPoints, numQuestions: quizData.quizNumQuestions, quizType: quizData.quizType,
-                    assignmentGroup: quizData.assignmentGroup, shuffleAnswers: quizData.shuffleAnswers, timeLimit: quizData.timeLimit,
-                    multipleAttempts: quizData.multipleAttempts, attempts: quizData.attempts, showCorrectAnswers: quizData.showCorrectAnswers,
-                    accessCode: quizData.accessCode, oneQAtATime: quizData.oneQAtATime, webcamRequired: quizData.webcamRequired,
-                    lockQAfterAnswer: quizData.lockQAfterAnswer, published: quizData.published, description: quizData.quizDetails
-                };
-                if (quizData.newQuiz) {
-                    dispatch(addQuiz(quiz))
-                } else {
-                    dispatch(updateQuiz(quiz))
-                }
-                navigate(quizData.quizURL);
-            }
-            const handleSaveAndPublish = () => {
-                const quiz = {
-                    _id: qid, title: quizData.quizTitle, course: cid, dueDate: quizData.quizDue,
-                    availableFromDate: quizData.quizAvailableFrom, availableTilDate: quizData.quizAvailableTil,
-                    points: quizData.quizPoints, numQuestions: quizData.quizNumQuestions, quizType: quizData.quizType,
-                    assignmentGroup: quizData.assignmentGroup, shuffleAnswers: quizData.shuffleAnswers, timeLimit: quizData.timeLimit,
-                    multipleAttempts: quizData.multipleAttempts, attempts: quizData.attempts, showCorrectAnswers: quizData.showCorrectAnswers,
-                    accessCode: quizData.accessCode, oneQAtATime: quizData.oneQAtATime, webcamRequired: quizData.webcamRequired,
-                    lockQAfterAnswer: quizData.lockQAfterAnswer, published: true, description: quizData.quizDetails
-                }; 
-                if (quizData.newQuiz) {
-                    dispatch(addQuiz(quiz))
-                } else {
-                    dispatch(updateQuiz(quiz))
-                }
-                navigate(`/Kambaz/Courses/${cid}/Quizzes`);
-            }
     return (
         <div id="wd-quiz-detail-editor">
             <div id="wd-quiz-detail-editor-header" className="d-flex flex-row-reverse align-items-center">
@@ -117,7 +62,7 @@ const Editor = ({quiz, qid, cid}: {quiz: quizProps, qid: string, cid: string}) =
                 </button>
                 {quiz.published ? <span className="float-end mx-4 fs-4 justify-content-between"><GreenCheckmark/>Published</span> : 
                 <span className="float-end text-secondary fs-4 mx-4 d-flex align-items-center justify-content-between"><AiOutlineStop/>Not Published</span>}
-                <span className="fs-4 float-end">Points {quiz.quizPoints}</span>
+                <span className="fs-4 float-end">Points {quiz.points}</span>
             </div>
             <hr/>
             <div id="wd-quiz-detail-editor-tabs">
@@ -137,12 +82,7 @@ const Editor = ({quiz, qid, cid}: {quiz: quizProps, qid: string, cid: string}) =
                     <Route path="Questions" element={<QuestionsEditorTab/>}/>
                 </Routes>
             </div>
-            <hr/>
-            <div className="mt-3 position-relative text-end text-nowrap" style={{width: "76%", left: "10%"}}>
-                <button onClick={() => {navigate(`/Kambaz/Courses/${cid}/Quizzes`)}} className="btn btn-md btn-secondary me-3">Cancel</button>
-                <button onClick={handleSave} className="btn btn-md btn-danger">Save</button>
-                <button onClick={handleSaveAndPublish} className="btn btn-md btn-success ms-3">Save and Publish</button>
-            </div>
+            
         </div>
     );
 }

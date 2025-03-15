@@ -10,7 +10,7 @@ export default function TextEditor({object, setObjectData, field}: {object: any;
     
     function onChange(e: { target: { value: any; }; }) {
     // setHtml(e.target.value);
-    setObjectData({...object, [field]: e.target.value})
+    setObjectData({...object, [field]: (e.target.value === "<br>" ? "" : e.target.value)})
     }
 
     return (

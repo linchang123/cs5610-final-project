@@ -4,6 +4,7 @@ import { addAssignment, updateAssignment } from "./reducer";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import AssnsignmentProps from "./AssignmentProps";
 
 export default function AssignmentEditor() {
     const { cid = "", aid = "" } = useParams();
@@ -13,70 +14,46 @@ export default function AssignmentEditor() {
             {/** Updating an existing course, feeding Editor component existing information */}
             return (
                 <Editor
-                    courseId={cid}
-                    assignmentId={aid}
-                    assignmentTitle={a.title} 
-                    assignmentAvailable={a.availableFromDate} 
-                    assignmentDue={a.dueDate}
-                    assignmentURL={"/Kambaz/Courses/" + cid + "/Assignments/"}
-                    assignmentTilDate={a.availableTilDate}
-                    assignmentDetails={a.description}
-                    assignmentPoints={a.points}
-                    newAssignment={false}
+                assignment={{ ...a, assignmentURL:`/Kambaz/Courses/${cid}/Assignments`}}
+                newAssignment={false}
                       />
             );
         } 
     }
     {/** Creating a new course, feeding Edirot component with default info */}
+    const assignment = {
+        course: cid,
+        _id: aid,
+        title: "New Assignment",
+        availableFromDate: "",
+        dueDate: "",
+        availableTilDate: "",
+        assignmentURL:"/Kambaz/Courses/" + cid + "/Assignments",
+        description: "",
+        points: 0
+    };
     return (<Editor 
-        courseId={cid}
-        assignmentId={aid}
-        assignmentTitle={""} 
-        assignmentAvailable={""} 
-        assignmentDue={""}
-        assignmentTilDate={""}
-        assignmentURL={"/Kambaz/Courses/" + cid + "/Assignments/"}
-        assignmentDetails={""}
-        assignmentPoints={100}
+        assignment={assignment}
         newAssignment={true} />);
     
 }
 
 const Editor = ( {
-    courseId,
-    assignmentId,
-    assignmentTitle, 
-    assignmentAvailable,
-    assignmentDue, 
-    assignmentTilDate, 
-    assignmentURL, 
-    assignmentDetails, 
-    assignmentPoints, 
+    assignment,
     newAssignment}: {
-    courseId: string;
-    assignmentId: string;
-    assignmentTitle: string;
-    assignmentAvailable:string;
-    assignmentDue: string;
-    assignmentTilDate: string;
-    assignmentURL: string;
-    assignmentDetails: string;
-    assignmentPoints: number;
+    assignment: AssnsignmentProps
     newAssignment: boolean;
 }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [assignmentData, setAssignmentData] = useState(() => ({
-        _id: assignmentId, title: assignmentTitle, course: courseId,
-        availableFromDate: assignmentAvailable, dueDate: assignmentDue,
-        availableTilDate: assignmentTilDate, description: assignmentDetails, points: assignmentPoints}));
+    const [assignmentData, setAssignmentData] = useState(() => ({...assignment}));
     const handleSave = () => {
         if (newAssignment) {
             dispatch(addAssignment(assignmentData));
         } else {
             dispatch(updateAssignment(assignmentData));
         }
-        navigate(assignmentURL);
+        navigate(assignment.assignmentURL);
     }
     return (
       <div id="wd-assignments-editor" className="ms-5">
@@ -178,7 +155,7 @@ const Editor = ( {
         </Row>
         <hr/>
         <div className="mt-3 text-end" style={{width: "76%"}}>
-            <button onClick={() => {navigate(assignmentURL)}} className="btn btn-lg btn-secondary me-2">Cancel</button>
+            <button onClick={() => {navigate(assignment.assignmentURL)}} className="btn btn-lg btn-secondary me-2">Cancel</button>
             <button onClick={handleSave} className="btn btn-lg btn-danger">Save</button>
         </div>
     </div>
