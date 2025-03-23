@@ -3,6 +3,7 @@ import QuestionEditor from "./QuestionEditor";
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate, useParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
+import DOMPurify from 'dompurify';
 import { deleteQuestion, editQuestion, addQuestion } from "./reducers/questionsReducer";
 
 export default function QuestionsEditorTab() {
@@ -12,7 +13,7 @@ export default function QuestionsEditorTab() {
     const dispatch = useDispatch();
     const handleNewQuestionButtonClick = () => {
         const newQuestion = {_id: uuidv4(), course: cid, quiz: qid, title:"New Question", points: 0, questionType: "Multiple Choice", prompt: " ",
-                             possibleAnswers: [], acceptedAnswers:[], editing: true}
+                             possibleAnswers: [], acceptedAnswers:[], editing: true, newQuestion: true}
         dispatch(addQuestion(newQuestion));
     }
     return (
@@ -31,7 +32,7 @@ export default function QuestionsEditorTab() {
                                 <FaTrash className="text-danger me-2 mb-1" onClick={() => dispatch(deleteQuestion(question._id))}/>
                             </div>
                         </div>
-                        <p className="bg-white text-start m-3">{question.prompt}</p>
+                        <div className="bg-white text-start m-3" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(question.prompt) }} />
                   </li>
                   )
             ))}

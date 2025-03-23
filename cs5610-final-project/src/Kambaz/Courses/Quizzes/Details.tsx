@@ -9,52 +9,41 @@ import { useSelector } from "react-redux";
 export default function QuizDetails() {
     const { cid, qid } = useParams();
     const { quizzes } = useSelector((state: any) => state.quizzesReducer);
+    const { questions } = useSelector((state: any) => state.questionsReducer);
+    const questionsInQuiz = questions
+        .filter((q:any) => q.course === cid && q.quiz === qid);
+    const quizPoints = questionsInQuiz
+        .reduce((sum: any, q: { points: any; }) => sum + q.points, 0);
     for (const q of quizzes) {
         if (q.course === cid && q._id === qid) {
-            return (
-                <Details 
-                    quizTitle={q.title}
-                    quizDue={q.dueDate}
-                    quizURL={"/Kambaz/Courses/" + cid + "/Quizzes/" + qid}
-                    quizPoints={q.points}
-                    quizAvailableFrom={q.availableFromDate}
-                    quizAvailableTil={q.availableTilDate}
-                    quizNumQuestions={q.numQuestions} 
-                    quizDetails={q.quizDetails} 
-                    quizType={q.quizType} 
-                    assignmentGroup={q.assignmentGroup.toUpperCase()} 
-                    shuffleAnswers={q.shuffleAnswers} 
-                    timeLimit={q.timeLimit} 
-                    multipleAttempts={q.multipleAttempts} 
-                    attempts={q.attempts} 
-                    showCorrectAnswers={q.showCorrectAnswers} 
-                    accessCode={q.accessCode} 
-                    oneQAtATime={q.oneQAtATime} 
-                    webcamRequired={q.webcamRequired} 
-                    lockQAfterAnswer={q.lockQAfterAnswer}
-                    published={q.published}
-                    newQuiz={false}/>
-            );
+            const quiz = {
+                ...q,
+                quizURL: `/Kambaz/Courses/${cid}/Quizzes/${qid}`,
+                newQuiz: false,
+                points: quizPoints,
+                numQuestions: questionsInQuiz
+            }
+            return (<Details quiz={quiz}/>);
         }
     }
     return (<h1>Details</h1>);
 }
 
-const Details = ({quizTitle, quizURL, quizPoints, quizAvailableFrom, quizAvailableTil, quizDue,
-    quizType, assignmentGroup, shuffleAnswers, timeLimit, multipleAttempts, showCorrectAnswers,
-    oneQAtATime, webcamRequired, lockQAfterAnswer}: quizProps) => {
-    const quizEditorPath = `${quizURL}/Editor`
+const Details = ({quiz}: {quiz: quizProps}) => {
+    const quizEditorPath = `${quiz.quizURL}/Editor`
     const editFields = {
-        "Quiz Type": quizType,
-        "Points": quizPoints,
-        "Assignment Group": assignmentGroup,
-        "Shuffle Answers": capitalizedYesNo(shuffleAnswers),
-        "Time Limit": timeLimit,
-        "Multiple Attempts": capitalizedYesNo(multipleAttempts),
-        "Show Correct Answers": capitalizedYesNo(showCorrectAnswers),
-        "One Question at a Time": capitalizedYesNo(oneQAtATime),
-        "Webcam Required": capitalizedYesNo(webcamRequired),
-        "Lock Questions After Answering": capitalizedYesNo(lockQAfterAnswer)
+        "Quiz Type": quiz.quizType,
+        "Points": quiz.points,
+        "Assignment Group": quiz.assignmentGroup,
+        "Shuffle Answers": capitalizedYesNo(quiz.shuffleAnswers),
+        "Time Limit": quiz.timeLimit + " Minutes",
+        "Multiple Attempts": capitalizedYesNo(quiz.multipleAttempts),
+        "How Many Attempts" : quiz.attempts,
+        "Show Correct Answers": capitalizedYesNo(quiz.showCorrectAnswers),
+        "Access Code": quiz.accessCode ? quiz.accessCode : "None",
+        "One Question at a Time": capitalizedYesNo(quiz.oneQAtATime),
+        "Webcam Required": capitalizedYesNo(quiz.webcamRequired),
+        "Lock Questions After Answering": capitalizedYesNo(quiz.lockQAfterAnswer)
     };
     return (
         <div id="wd-quiz-detail">
@@ -66,7 +55,7 @@ const Details = ({quizTitle, quizURL, quizPoints, quizAvailableFrom, quizAvailab
                 </Link>
             </div>
             <hr/>
-            <h2 id="wd-quiz-detail-title" className="mb-5" >{quizTitle}</h2>
+            <h2 id="wd-quiz-detail-title" className="mb-5" >{quiz.title}</h2>
             <div id="wd-quiz-detail-table" className="text-center" >
             {Object.entries(editFields).map(([key, val] : [key: string, val: any]) => (
             <Row className="my-2">
@@ -84,11 +73,12 @@ const Details = ({quizTitle, quizURL, quizPoints, quizAvailableFrom, quizAvailab
                 </div>
                 <hr className="m-1"/>
                 <div className="d-grid grid-template-columns-4 text-start">
-                    <div className="">{formatDate(quizDue)}</div>
+                    <div className="">{formatDate(quiz.dueDate)}</div>
                     <div>Everyone</div>
-                    <div>{formatDate(quizAvailableFrom)}</div>
-                    <div>{formatDate(quizAvailableTil)}</div>
+                    <div>{formatDate(quiz.availableFromDate)}</div>
+                    <div>{formatDate(quiz.availableTilDate)}</div>
                 </div>
+                {/* <hr/> */}
             </div>
         </div>
     );

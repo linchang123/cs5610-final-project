@@ -74,3 +74,12 @@ body * {  font-family: Arial, Helvetica, sans-serif;  }
   color: white !important;
 }
 
+.wd-question-editor-truefalse-radio input[type="radio"]{
+  display: none;
+}
+.wd-question-editor-truefalse-radio label {
+  cursor: pointer;
+  padding-left: 0;
+  position: relative;
+  right: 45%
+}

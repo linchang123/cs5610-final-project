@@ -12,13 +12,20 @@ import { useState } from "react";
 export default function QuizDetailsEditor() {
     const { cid, qid } = useParams();
     const { quizzes } = useSelector((state: any) => state.quizzesReducer);
+    const { questions } = useSelector((state: any) => state.questionsReducer);
     let currQuiz: quizProps;
     for (const q of quizzes) {
         if (q.course === cid && q._id === qid) {
+            const questionsInQuiz = questions
+            .filter((q:any) => q.course === cid && q.quiz === qid);
+            const quizPoints = questionsInQuiz
+            .reduce((sum: any, q: { points: any; }) => sum + q.points, 0);
             currQuiz = {
                 ...q,
                 quizURL: `/Kambaz/Courses/${cid}/Quizzes/${qid}`,
                 newQuiz: false,
+                points: quizPoints,
+                numQuestions: questionsInQuiz
             }
             return (<Editor quiz={currQuiz}/>);
         }

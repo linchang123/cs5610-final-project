@@ -33,6 +33,13 @@ export default function DetailsEditorTab({quizData, setQuizData}: {quizData: any
         }
         navigate(`/Kambaz/Courses/${quizData.course}/Quizzes`);
     }
+    const handleAttemptsSetting = (allowMultipleAttempts: boolean) => {
+        if (allowMultipleAttempts) {
+            setQuizData({...quizData, multipleAttempts: allowMultipleAttempts })
+        } else {
+            setQuizData({...quizData, multipleAttempts: allowMultipleAttempts, attempts: 1 })
+        }
+    }
     return (
         <div id="wd-quiz-editor-details-tab">
             {/* {Object.entries(quizData).map(([key, val] : [key: string, val: any]) => (
@@ -43,10 +50,6 @@ export default function DetailsEditorTab({quizData, setQuizData}: {quizData: any
                 <FormLabel className="mt-3 w-75">Quiz Instructions: </FormLabel>
                 <div className="w-75 position-relative" style={{right: "8px"}}><TextEditor object={quizData} setObjectData={setQuizData} field={"description"}/></div>
             </FormGroup>
-            <Row className="mt-3">
-                <Col xs={3} className="text-end mt-1"><label htmlFor="wd-points">Points</label></Col>
-                <Col xs={9}><input style={{width: "67%"}} type="number" id="wd-points" value={quizData.points} onChange={(e) => setQuizData({...quizData, points: parseInt(e.target.value)})} className="form-control"/></Col>
-            </Row>
             <Row className="mt-3">
                 <Col xs={3} className="text-end mt-1"><label htmlFor="wd-quiz-type">Quiz Type</label></Col>
                 <Col xs={9} >
@@ -74,22 +77,22 @@ export default function DetailsEditorTab({quizData, setQuizData}: {quizData: any
             <Row className="mt-3">
                 <Col xs={3} className="text-end"></Col>
                 <Col xs={9} >
-                    <Form.Group as={Row} className="mb-3">
+                    <Form.Group as={Row} className="mb-3" controlId="options">
                         <Form.Label className="fw-bold">Options</Form.Label>
                         {Object.entries(options).map(([key, val] : [key: string, val: keyof quizProps]) => (
-                            <Form.Check label={key} className="mt-2"
+                            <Form.Check label={key} className="mt-2" id={key}
                             checked={quizData[val] as boolean} onChange={(e) => setQuizData({...quizData, [val]: (e.target as HTMLInputElement).checked })} />
                         ))}
                         <Form.Check className="me-3 mt-2" label={"Multiple Attempts"} checked={quizData.multipleAttempts} 
-                        onChange={(e) => setQuizData({...quizData, multipleAttempts: (e.target as HTMLInputElement).checked })}/>
+                        onChange={(e) => handleAttemptsSetting((e.target as HTMLInputElement).checked)}/>
                         {quizData.multipleAttempts && (
-                            <Form.Group className="ms-3" id="wd-quiz-allowed-attempts">
+                            <Form.Group className="ms-3" id="wd-quiz-allowed-attempts" controlId="multipleAttempts"> 
                                 <Form.Label className="m-0 my-1">Allowed Attempts</Form.Label>
-                                <Form.Control className="w-25 mt-1" defaultValue={quizData.attempts} 
+                                <Form.Control className="w-25 mt-1" defaultValue={quizData.attempts} id="multipleAttempts"
                                 onChange={(e) => setQuizData({...quizData, attempts: parseInt(e.target.value) })}/>
                             </Form.Group>
                         )}
-                        <Form.Check className="me-3 mt-2" label={"Time Limit"} checked={quizData.timeLimit < Infinity || quizData.timeLimit == undefined}
+                        <Form.Check className="me-3 mt-2" label={"Time Limit"} checked={quizData.timeLimit < Infinity || quizData.timeLimit == undefined} id="wd-quiz-time-limit"
                         onChange={(e) => setQuizData({...quizData, timeLimit: (e.target as HTMLInputElement).checked ? 20: Infinity })}/>
                         {(quizData.timeLimit < Infinity) && (
                             <Form.Group className="ms-3 d-flex align-items-center">
@@ -97,8 +100,9 @@ export default function DetailsEditorTab({quizData, setQuizData}: {quizData: any
                                 <Form.Label className="m-0 ms-2">Minutes</Form.Label>
                             </Form.Group>
                         )}
-                        <Form.Check className="me-3 mt-2" label={"Access Code"} checked={quizData.accessCode !== ""} onChange={(e) => setQuizData({...quizData, accessCode: (e.target as HTMLInputElement).checked ? "1": "" })}/>
-                        {quizData.accessCode && (<Form.Control className="w-25 mt-1" defaultValue={quizData.accessCode} onChange={(e) => setQuizData({...quizData, accessCode: e.target.value })}/>)}
+                        <Form.Check className="me-3 mt-2" label={"Access Code"} checked={quizData.accessCode !== ""} onChange={(e) => setQuizData({...quizData, accessCode: (e.target as HTMLInputElement).checked ? "1234": "" })
+                         } id="wd-quiz-access-code"/>
+                        {quizData.accessCode && (<Form.Control className="w-25 mt-1 ms-4" defaultValue={quizData.accessCode} onChange={(e) => setQuizData({...quizData, accessCode: e.target.value })}/>)}
                     </Form.Group>
                 </Col>
             </Row>

@@ -3,7 +3,7 @@ import { Col, Form,FormSelect} from "react-bootstrap";
 import TextEditor from "../utility/TextEditor";
 import AnswerGroup from "./AnswerGroup";
 import { useDispatch } from "react-redux";
-import { updateQuestion, editQuestion} from "./reducers/questionsReducer";
+import { updateQuestion, editQuestion, deleteQuestion} from "./reducers/questionsReducer";
 
 export default function QuestionEditor({question}:{question: any}) {
     const dispatch = useDispatch();
@@ -23,7 +23,11 @@ export default function QuestionEditor({question}:{question: any}) {
         dispatch(updateQuestion({...questionData}))
     };
     const handleCancelQuestionEdit = () => {
-        dispatch(editQuestion({_id: questionData._id, edit: false}))
+        if (question.newQuestion) {
+            dispatch(deleteQuestion(questionData._id));
+        } else {
+            dispatch(editQuestion({_id: questionData._id, edit: false}))
+        }
     };
     return (
         <div className="w-100 border border-secondary my-5">

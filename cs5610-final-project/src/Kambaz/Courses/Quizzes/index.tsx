@@ -68,10 +68,9 @@ const QuizList = ({quizzes, cid}:{quizzes: any; cid: string}) => {
                     // quizDetails=""
                     published={quiz.published}
                     quizId={quiz._id}
-                    quizNumQuestions={quiz.numQuestions}
                     quizAvailableFrom={quiz.availableFromDate}
                     quizAvailableTil={quiz.availableTilDate}
-                    quizPoints={quiz.points}/>))}
+                    courseId={cid}/>))}
                 </ul>
             </div>
         );
@@ -80,17 +79,23 @@ const QuizList = ({quizzes, cid}:{quizzes: any; cid: string}) => {
     }
 }
 
-const Quiz = ({quizTitle, quizDue, quizURL, quizPoints, quizNumQuestions, published, quizId,
-               quizAvailableFrom, quizAvailableTil
+const Quiz = ({quizTitle, quizDue, quizURL, published, quizId,
+               quizAvailableFrom, quizAvailableTil, courseId
             }: {
-        quizTitle: string; quizDue: string; quizURL: string; quizPoints: number; quizNumQuestions:number;
-        published: boolean; quizId: string; quizAvailableFrom: string; quizAvailableTil: string
+        quizTitle: string; quizDue: string; quizURL: string;
+        published: boolean; quizId: string; quizAvailableFrom: string; quizAvailableTil: string; courseId: string
     }) => {
         const dispatch = useDispatch();
         const navigate = useNavigate();
         const handlePublishSymbolClick = () => {dispatch(publishQuiz(quizId))};
         const handleDeleteButtonClick = () => {dispatch(deleteQuiz(quizId))};
-        const handleEditButtonClick = () => {navigate(`${quizId}/Editor`)};
+        const handleEditButtonClick = () => {navigate(`${quizId}`)};
+        const { questions } = useSelector((state: any) => state.questionsReducer);
+        const { currentUser } = useSelector((state: any) => state.accountReducer); 
+        const questionsInQuiz = questions
+        .filter((q:any) => q.course === courseId && q.quiz === quizId);
+        const quizPoints = questionsInQuiz
+        .reduce((sum: any, q: { points: any; }) => sum + q.points, 0);
     return (
         <li className="wd-quiz-list-item list-group-item p-3 ps-1 d-flex align-items-center">
              <RxRocket className="m-2 fs-3 "style={{minWidth: "30px"}}/>
@@ -101,7 +106,8 @@ const Quiz = ({quizTitle, quizDue, quizURL, quizPoints, quizNumQuestions, publis
                  </a> 
                  <p className="m-0">
                     <span className="me-1"><QuizAvailability quizAvailableFrom={quizAvailableFrom} quizAvailableTil={quizAvailableTil}/></span> |
-                     <span className="fw-bold mx-1">Due</span> {quizDue} | {quizPoints}pts | {quizNumQuestions} questions
+                     <span className="fw-bold mx-1">Due</span> {quizDue} | {quizPoints} pts | {questionsInQuiz.length} questions
+                     {currentUser.role === "STUDENT" ? "| Score 0pt" : ""}
                  </p>
 
              </div>
