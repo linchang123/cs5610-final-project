@@ -8,7 +8,8 @@ import { updateQuestion, editQuestion, deleteQuestion} from "./reducers/question
 export default function QuestionEditor({question}:{question: any}) {
     const dispatch = useDispatch();
     const questionType = ["Multiple Choice", "True/False", "Fill in the Blank"];
-    const [questionData, setQuestionData] = useState({
+    const [questionData, setQuestionData] = useState(
+        {
         _id: question._id,
         title: question.title,
         points: question.points,
@@ -18,7 +19,8 @@ export default function QuestionEditor({question}:{question: any}) {
         acceptedAnswers: question.acceptedAnswers,
         course: question.course,
         quiz: question.quiz
-    });
+    }
+);
     const handleSaveQuestionEdit = () => {
         dispatch(updateQuestion({...questionData}))
     };
@@ -27,6 +29,13 @@ export default function QuestionEditor({question}:{question: any}) {
             dispatch(deleteQuestion(questionData._id));
         } else {
             dispatch(editQuestion({_id: questionData._id, edit: false}))
+        }
+    };
+    const handleQuestionTypeChange = (e: any) => {
+        if (e.target.value === "True/False") {
+            setQuestionData({...questionData, questionType: e.target.value, possibleAnswers:["True", "False"], "acceptedAnswers": ["True"]});
+        } else {
+            setQuestionData({...questionData, questionType: e.target.value, possibleAnswers:[], "acceptedAnswers": []});
         }
     };
     return (
@@ -44,7 +53,7 @@ export default function QuestionEditor({question}:{question: any}) {
                     </Form.Group>
 
                     <Form.Group controlId="formGridQuestionType" className="mt-3 p-lg-0 px-3">
-                        <FormSelect className="form-control"  as={Col} id="wd-quiz-type" onChange={(e) => setQuestionData({...questionData, questionType: e.target.value})}>
+                        <FormSelect className="form-control"  as={Col} id="wd-quiz-type" onChange={(e) => handleQuestionTypeChange(e)}>
                             {questionType.map((q) => (
                                 <option value={q} selected={questionData.questionType === q}>{q}
                                 </option>))}
