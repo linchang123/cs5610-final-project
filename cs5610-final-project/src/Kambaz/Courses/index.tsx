@@ -11,38 +11,44 @@ import QuizDetails from "./Quizzes/Details";
 import QuizDetailsEditor from "./Quizzes/DetailsEditor";
 import { useSelector } from "react-redux";
 import FacultyFeatures from "../Account/FacultyFeatures";
+import PreviewQuiz from "./Quizzes/PreviewQuiz";
+import TakeQuiz from "./Quizzes/TakeQuiz";
+
 
 export default function Courses() {
     const { cid } = useParams();
-    const {pathname} = useLocation();
+    const { pathname } = useLocation();
     const { courses } = useSelector((state: any) => state.coursesReducer);
     const course = courses.find((course: { _id: string | undefined; }) => course._id === cid);
     return (
-      <div id="wd-courses">
-        <h2 className="text-danger">
-        <FaAlignJustify className="me-4 fs-4 mb-1" />
-        {course && course.name} &gt; {pathname.split("/")[4]}
-        </h2>
-        <hr />
-        <div className="d-flex">
-            <div className="d-none d-md-block">
-                <CourseNavigation />
-            </div>
-            <div className="flex-fill">
-                <Routes>
-                <Route path="/" element={<Navigate to="Home" />} />
-                <Route path="Home" element={<Home/>} />
-                <Route path="Modules" element={<Modules/>} />
-                <Route path="Assignments" element={<Assignments />} />
-                <Route path="Assignments/:aid" element={<FacultyFeatures><AssignmentEditor/></FacultyFeatures>} />
-                <Route path="People" element={<PeopleTable />} />
-                <Route path="Quizzes" element={<Quizzes/>}/>
-                <Route path="Quizzes/:qid" element={<FacultyFeatures><QuizDetails/></FacultyFeatures>}/>
-                <Route path="Quizzes/:qid/Editor/*" element={<FacultyFeatures><QuizDetailsEditor/></FacultyFeatures>} />
-                </Routes>
-            </div>
-        </div>
+        <div id="wd-courses">
+            <h2 className="text-danger">
+                <FaAlignJustify className="me-4 fs-4 mb-1" />
+                {course && course.name} &gt; {pathname.split("/")[4]}
+            </h2>
+            <hr />
+            <div className="d-flex">
+                <div className="d-none d-md-block">
+                    <CourseNavigation />
+                </div>
+                <div className="flex-fill">
+                    <Routes>
+                        <Route path="/" element={<Navigate to="Home" />} />
+                        <Route path="Home" element={<Home />} />
+                        <Route path="Modules" element={<Modules />} />
+                        <Route path="Assignments" element={<Assignments />} />
+                        <Route path="Assignments/:aid" element={<FacultyFeatures><AssignmentEditor /></FacultyFeatures>} />
+                        <Route path="People" element={<PeopleTable />} />
+                        <Route path="Quizzes" element={<Quizzes />} />
+                        <Route path="Quizzes/:qid" element={<FacultyFeatures><QuizDetails /></FacultyFeatures>} />
+                        <Route path="Quizzes/:qid/Editor/*" element={<FacultyFeatures><QuizDetailsEditor /></FacultyFeatures>} />
+                        <Route path="Quizzes/:qid/Preview" element={<FacultyFeatures><PreviewQuiz /></FacultyFeatures>} />
+                        <Route path="Quizzes/:qid/Take" element={<TakeQuiz />} />
 
-      </div>
-  );}
-  
+                    </Routes>
+                </div>
+            </div>
+
+        </div>
+    );
+}
