@@ -1,5 +1,5 @@
 import { IoEllipsisVertical } from "react-icons/io5";
-import { useDispatch, useSelector } from "react-redux";
+// import { useDispatch, useSelector } from "react-redux";
 import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import quizProps from "./QuizProps";
 import GreenCheckmark from "../utility/GreenCheckMark";
@@ -7,31 +7,14 @@ import { AiOutlineStop } from "react-icons/ai";
 import { Nav } from "react-bootstrap";
 import DetailsEditorTab from "./DetailsEditorTab";
 import QuestionsEditorTab from "./QuestionsEditorTab";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import * as quizzesClient from "./client";
 
 export default function QuizDetailsEditor() {
     const { cid, qid } = useParams();
-    const { quizzes } = useSelector((state: any) => state.quizzesReducer);
-    const { questions } = useSelector((state: any) => state.questionsReducer);
-    let currQuiz: quizProps;
-    for (const q of quizzes) {
-        if (q.course === cid && q._id === qid) {
-            const questionsInQuiz = questions
-            .filter((q:any) => q.course === cid && q.quiz === qid);
-            const quizPoints = questionsInQuiz
-            .reduce((sum: any, q: { points: any; }) => sum + q.points, 0);
-            currQuiz = {
-                ...q,
-                quizURL: `/Kambaz/Courses/${cid}/Quizzes/${qid}`,
-                newQuiz: false,
-                points: quizPoints,
-                numQuestions: questionsInQuiz
-            }
-            return (<Editor quiz={currQuiz}/>);
-        }
-    }
-    currQuiz = {
-        _id: qid ? qid: "",
+    // const { quizzes } = useSelector((state: any) => state.quizzesReducer);
+    // const { questions } = useSelector((state: any) => state.questionsReducer);
+    const [quiz, setQuiz] = useState({_id: qid ? qid : "",
         course: cid ? cid: "",
         title: "New Quiz",
         dueDate: "",
@@ -53,9 +36,51 @@ export default function QuizDetailsEditor() {
         webcamRequired: false, 
         lockQAfterAnswer: false,
         published: false,
-        newQuiz: true
-    }
-    return (<Editor quiz={currQuiz}/>);
+        newQuiz: true});
+    const [loading, setLoading] = useState(false);
+    // for (const q of quizzes) {
+    //     if (q.course === cid && q._id === qid) {
+    //         const questionsInQuiz = questions
+    //         .filter((q:any) => q.course === cid && q.quiz === qid);
+    //         const quizPoints = questionsInQuiz
+    //         .reduce((sum: any, q: { points: any; }) => sum + q.points, 0);
+    //         currQuiz = {
+    //             ...q,
+    //             quizURL: `/Kambaz/Courses/${cid}/Quizzes/${qid}`,
+    //             newQuiz: false,
+    //             points: quizPoints,
+    //             numQuestions: questionsInQuiz
+    //         }
+    //         return (<Editor quiz={currQuiz}/>);
+    //     }
+    // }
+    const fetchQuiz = async () => {
+        try {
+            setLoading(true);
+            const q = await quizzesClient.getQuizById(qid as string);
+            const numQuestions = await quizzesClient.fetchQuizQuestionCount(qid as string);
+            const points = await quizzesClient.fetchQuizPoints(qid as string);
+            setQuiz({...q,
+                newQuiz: false,
+                numQuestions: numQuestions,
+                points: points,
+                availableFromDate: formatDateString(q.availableDate),
+                availableTilDate: formatDateString(q.untilDate),
+                dueDate: formatDateString(q.dueDate),
+                attempts: q.howManyAttempts,
+                quizURL: `/Kambaz/Courses/${cid}/Quizzes/${qid}`,
+                oneQAtATime: q.oneQuestionAtATime,
+                lockQAfterAnswer: q.lockQuestionsAfterAnswering,
+                course: q.courseId
+            })
+        } catch (error: any) {
+        }
+        setLoading(false)
+    };
+    useEffect(() => {
+        fetchQuiz();
+  }, [qid]);
+  return (!loading && <Editor quiz={quiz}/>)
 }
 
 const Editor = ({quiz}: {quiz: quizProps}) => {
@@ -94,3 +119,7 @@ const Editor = ({quiz}: {quiz: quizProps}) => {
     );
 }
 
+const formatDateString = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
+}

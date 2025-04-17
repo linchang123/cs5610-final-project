@@ -1,12 +1,13 @@
 import quizProps from "./QuizProps";
 import { Col, Form, FormControl, FormGroup, FormLabel, FormSelect, Row } from "react-bootstrap";
 import TextEditor from "../utility/TextEditor";
-import { useDispatch } from "react-redux";
+// import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { addQuiz, updateQuiz } from "./reducers/reducer";
+// import { addQuiz, updateQuiz } from "./reducers/reducer";
+import * as quizzesClient from "./client";
+import {formatQuiz} from "../utility/formatQuiz";
 
 export default function DetailsEditorTab({quizData, setQuizData}: {quizData: any; setQuizData: (q:any) => void}) {
-    const dispatch = useDispatch();
     const navigate = useNavigate();
     const quizTypeOptions = ["Graded Quiz", "Practice Quiz", "Graded Survey", "Ungraded Survey"];
     const assignmentGroupOptions = ["QUIZZES", "ASSIGNMENTS", "EXAMS", "PROJECT"];
@@ -15,21 +16,41 @@ export default function DetailsEditorTab({quizData, setQuizData}: {quizData: any
                   "One Question at a Time": "oneQAtATime", 
                   "Webcam Required": "webcamRequired", 
                   "Lock Questions After Answering": "lockQAfterAnswer"};
-    const handleSave = () => {
-    const {newQuiz, quizURL, ...quiz} = quizData;
+    const handleSave = async () => {
+    const quizToSend = formatQuiz(quizData);
     if (quizData.newQuiz) {
-        dispatch(addQuiz(quiz))
+        // dispatch(addQuiz(quiz))
+        try {
+            await quizzesClient.createQuiz(quizData.course, quizToSend)
+        } catch (e) {
+            alert("error occurs in creating quizzes")
+        }
     } else {
-        dispatch(updateQuiz(quiz))
+        // dispatch(updateQuiz(quiz))
+        try {
+            await quizzesClient.updateQuiz(quizData._id, quizToSend)
+        } catch (e) {
+            alert("error occurs in updating quizzes")
+        }
     }
     navigate(quizData.quizURL);
     }
-    const handleSaveAndPublish = () => {
-        const {newQuiz, quizURL, ...quiz} = quizData;
+    const handleSaveAndPublish = async () => {
+        const quizToSend = formatQuiz({...quizData, published: true});
         if (quizData.newQuiz) {
-            dispatch(addQuiz({...quiz, published: true}))
+            // dispatch(addQuiz({...quiz, published: true}))
+            try {
+                await quizzesClient.createQuiz(quizData.course, quizToSend)
+            } catch (e) {
+                alert("error occurs in creating quizzes")
+            }
         } else {
-            dispatch(updateQuiz({...quiz, published: true}))
+            // dispatch(updateQuiz({...quiz, published: true}))
+            try {
+                await quizzesClient.updateQuiz(quizData._id, quizToSend)
+            } catch (e) {
+                alert("error occurs in updating quizzes")
+            }
         }
         navigate(`/Kambaz/Courses/${quizData.course}/Quizzes`);
     }
@@ -143,3 +164,4 @@ export default function DetailsEditorTab({quizData, setQuizData}: {quizData: any
             </div>
     );
 }
+

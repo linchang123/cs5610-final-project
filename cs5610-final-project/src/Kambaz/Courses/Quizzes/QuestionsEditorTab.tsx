@@ -4,7 +4,9 @@ import { v4 as uuidv4 } from "uuid";
 import { useNavigate, useParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import DOMPurify from 'dompurify';
-import { deleteQuestion, editQuestion, addQuestion } from "./reducers/questionsReducer";
+import { deleteQuestion, editQuestion, addQuestion, setQuestions } from "./reducers/questionsReducer";
+import { useEffect } from "react";
+import * as questionsClient from "./questionsClient";
 
 export default function QuestionsEditorTab() {
     const {cid, qid} = useParams();
@@ -16,10 +18,22 @@ export default function QuestionsEditorTab() {
                              possibleAnswers: [], acceptedAnswers:[], editing: true, newQuestion: true}
         dispatch(addQuestion(newQuestion));
     }
+    const fetchQuestions = async () => {
+        try {
+            const questions = await questionsClient.fetchQuestionsForQuiz(qid as string);
+            dispatch(setQuestions(questions));
+        } catch (error: any) {
+            alert("error occurs in fetching questions")
+        }
+        };
+    useEffect(() => {
+        fetchQuestions();
+    }, []);
     return (
         <div className="text-center d-flex flex-column align-items-center">
             <ul id="wd-quiz-questions-list" className="list-group rounded-0 w-75 mt-4">
-            {questions.filter((question: any) => question.course === cid && question.quiz === qid)
+            {questions
+            // .filter((question: any) => question.course === cid && question.quiz === qid)
             .map((question: any, index: number) => (
                 question.editing ? 
                 <QuestionEditor question={question}/>
@@ -29,10 +43,17 @@ export default function QuestionsEditorTab() {
                             <span className="ms-3">({question.points} pts)</span>
                             <div className="wd-quiz-question-control-buttons float-end">
                                 <FaPencil className="text-primary me-3" onClick={() => {dispatch(editQuestion({_id: question._id, edit: true}))}}/>
-                                <FaTrash className="text-danger me-2 mb-1" onClick={() => dispatch(deleteQuestion(question._id))}/>
+                                <FaTrash className="text-danger me-2 mb-1" onClick={async () => {
+                                    try {
+                                        await questionsClient.deleteQuestion(question._id);
+                                        dispatch(deleteQuestion(question._id))
+                                    } catch (error: any) {
+                                        alert("error occurs in deleting question")
+                                    }
+                                    }}/>
                             </div>
                         </div>
-                        <div className="bg-white text-start m-3" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(question.prompt) }} />
+                        <div className="bg-white text-start m-3" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(question.questionText) }} />
                   </li>
                   )
             ))}

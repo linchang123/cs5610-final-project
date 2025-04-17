@@ -7,18 +7,19 @@ import { updateQuestion, editQuestion, deleteQuestion} from "./reducers/question
 
 export default function QuestionEditor({question}:{question: any}) {
     const dispatch = useDispatch();
-    const questionType = ["Multiple Choice", "True/False", "Fill in the Blank"];
+    const qType = ["Multiple Choice", "True/False", "Fill in the Blank"];
     const [questionData, setQuestionData] = useState(
         {
-        _id: question._id,
-        title: question.title,
-        points: question.points,
-        questionType: question.questionType,
-        prompt: question.prompt,
-        possibleAnswers: question.possibleAnswers,
-        acceptedAnswers: question.acceptedAnswers,
-        course: question.course,
-        quiz: question.quiz
+        _id: question?._id,
+        title: question?.title,
+        points: question?.points,
+        prompt: question?.questionText,
+        correctAnswer: question?.correctAnswer,
+        course: question?.course,
+        quiz: question?.quiz,
+        questionType: formatQuestionType(question?.questionType),
+        choices: question.choices,
+
     }
 );
     const handleSaveQuestionEdit = () => {
@@ -33,7 +34,7 @@ export default function QuestionEditor({question}:{question: any}) {
     };
     const handleQuestionTypeChange = (e: any) => {
         if (e.target.value === "True/False") {
-            setQuestionData({...questionData, questionType: e.target.value, possibleAnswers:["True", "False"], "acceptedAnswers": ["True"]});
+            setQuestionData({...questionData, questionType: e.target.value, correctAnswer: {}});
         } else {
             setQuestionData({...questionData, questionType: e.target.value, possibleAnswers:[], "acceptedAnswers": []});
         }
@@ -54,7 +55,7 @@ export default function QuestionEditor({question}:{question: any}) {
 
                     <Form.Group controlId="formGridQuestionType" className="mt-3 p-lg-0 px-3">
                         <FormSelect className="form-control"  as={Col} id="wd-quiz-type" onChange={(e) => handleQuestionTypeChange(e)}>
-                            {questionType.map((q) => (
+                            {qType.map((q) => (
                                 <option value={q} selected={questionData.questionType === q}>{q}
                                 </option>))}
                         </FormSelect>
@@ -62,7 +63,7 @@ export default function QuestionEditor({question}:{question: any}) {
                 </div>
                 <hr/>
             </Form>
-            <QuestionInstruction questionType={questionData.questionType}/>
+            <QuestionInstruction questionType={questionData.questionType ? questionData.questionType : ""}/>
             <h5 className="text-start m-3 fw-bold">Question: </h5>
             <TextEditor object={questionData} setObjectData={setQuestionData} field="prompt"/>
             <h5 className="text-start m-3 fw-bold">Answers: </h5>
@@ -87,4 +88,23 @@ function QuestionInstruction({questionType}: {questionType: string}) {
             "Students will see the question followed by a small text box to type their answer."]
     }
     return (instruction.map(i => (<p className="text-start my-0 ms-3">{i}</p>)))
+}
+
+function formatQuestionType(type: string) {
+    if (!type){
+        return "";
+    }else if (type === "multiple-choice") {
+        return "Multiple Choice";
+    } else if (type === "true-false") {
+        return "True/False";
+    } else if (type === "fill-in-blank"){
+        return "Fill in the Blank";
+    } else if (type === "Multiple Choice") {
+        return "multiple-choice";
+    } else if (type === "True/False") {
+        return "true-false";
+    } else if (type === "Fill in the Blank") {
+        return "fill-in-blank";
+    }
+    return "";
 }

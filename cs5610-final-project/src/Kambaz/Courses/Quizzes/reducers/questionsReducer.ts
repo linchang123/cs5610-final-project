@@ -1,14 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { questions } from "../../../Database";
+// import { questions } from "../../../Database";
 
 const initialState = {
-    questions: questions,
+    questions: [],
 };
 
 const questionsSlice = createSlice({
   name: "questions",
   initialState,
   reducers: {
+    setQuestions: (state, action) => {
+      state.questions = action.payload;
+    },
     addQuestion: (state, { payload: question }) => {
       state.questions = [...state.questions, {...question}] as any;
     },
@@ -28,6 +31,6 @@ const questionsSlice = createSlice({
     },
   },
 });
-export const { addQuestion, deleteQuestion, updateQuestion, editQuestion } =
+export const { addQuestion, deleteQuestion, updateQuestion, editQuestion, setQuestions } =
 questionsSlice.actions;
 export default questionsSlice.reducer;

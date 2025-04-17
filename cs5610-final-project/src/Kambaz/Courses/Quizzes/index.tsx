@@ -7,24 +7,48 @@ import { useNavigate, useParams } from "react-router";
 import { RxRocket } from "react-icons/rx";
 import { FaMagnifyingGlass, FaPlus } from "react-icons/fa6";
 import FacultyFeatures from "../../Account/FacultyFeatures";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { v4 as uuidv } from "uuid";
 import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import { AiOutlineStop } from "react-icons/ai";
-import { deleteQuiz, publishQuiz } from "./reducers/reducer";
+import { deleteQuiz, publishQuiz, setQuizzes } from "./reducers/reducer";
+import * as quizzesClient from "./client";
 import "../../styles.css";
+import {formatQuiz} from "../utility/formatQuiz";
 
 export default function Quizzes() {
     const { cid } = useParams();
     const { quizzes } = useSelector((state: any) => state.quizzesReducer); 
     const [quizId, setQuizId] = useState(uuidv());
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     {/** function for handling clicking on "+Quiz" button */}
     const handleButtonClick = () => {
         navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/Editor`);
         setTimeout(() => setQuizId(uuidv4()), 500);
       }
+    const fetchQuizzes = async () => {
+    try {
+        const quizzes = await quizzesClient.fetchQuizzesForCourse(cid as string);
+        let currQuiz = [];
+        for (const q of quizzes) {
+            try {
+                const numQuestions = await quizzesClient.fetchQuizQuestionCount(q._id as string);
+                const points = await quizzesClient.fetchQuizPoints(q._id as string);
+                currQuiz.push({...q, numQuestions, points});
+            } catch(e) {
+                alert("erorr occurs in fetching points or questions");
+            }
+        }
+        dispatch(setQuizzes(currQuiz));
+    } catch (error: any) {
+        alert("error occurs in fetching quizzes")
+    }
+    };
+    useEffect(() => {
+        fetchQuizzes();
+    }, []);
     return (
       <div id="wd-quiz">
         <div className="text-nowrap py-3">
@@ -49,10 +73,10 @@ export default function Quizzes() {
 const QuizList = ({quizzes, cid}:{quizzes: any; cid: string}) => {
     let currCourseQuiz = [];
     const { currentUser } = useSelector((state: any) => state.accountReducer); 
-    if (currentUser.role === "FACULTY") {
-        currCourseQuiz = quizzes.filter((quiz: any) => quiz.course === cid);
+    if (currentUser.role === "STUDENT") {
+        currCourseQuiz = quizzes.filter((quiz: any) => (quiz.published == true));
     } else {
-        currCourseQuiz = quizzes.filter((quiz: any) => (quiz.course === cid && quiz.published == true));
+        currCourseQuiz = quizzes;
     }
     if (currCourseQuiz.length > 0) {
         return (
@@ -68,9 +92,11 @@ const QuizList = ({quizzes, cid}:{quizzes: any; cid: string}) => {
                     // quizDetails=""
                     published={quiz.published}
                     quizId={quiz._id}
-                    quizAvailableFrom={quiz.availableFromDate}
-                    quizAvailableTil={quiz.availableTilDate}
-                    courseId={cid}/>))}
+                    quizAvailableFrom={quiz.availableDate}
+                    quizAvailableTil={quiz.untilDate}
+                    numQuestions={quiz.numQuestions}
+                    points={quiz.points}
+                    quiz={quiz}/>))}
                 </ul>
             </div>
         );
@@ -80,22 +106,36 @@ const QuizList = ({quizzes, cid}:{quizzes: any; cid: string}) => {
 }
 
 const Quiz = ({quizTitle, quizDue, quizURL, published, quizId,
-               quizAvailableFrom, quizAvailableTil, courseId
+               quizAvailableFrom, quizAvailableTil, numQuestions, quiz, points
             }: {
-        quizTitle: string; quizDue: string; quizURL: string;
-        published: boolean; quizId: string; quizAvailableFrom: string; quizAvailableTil: string; courseId: string
+        quizTitle: string; quizDue: string; quizURL: string; quiz: any;
+        published: boolean; quizId: string; quizAvailableFrom: string; quizAvailableTil: string; numQuestions: number; points: number
     }) => {
         const dispatch = useDispatch();
         const navigate = useNavigate();
-        const handlePublishSymbolClick = () => {dispatch(publishQuiz(quizId))};
-        const handleDeleteButtonClick = () => {dispatch(deleteQuiz(quizId))};
+        const handlePublishSymbolClick = async () => {
+            try {
+                await quizzesClient.updateQuiz(quiz._id, {...quiz, published: !quiz.published})
+                dispatch(publishQuiz(quizId));
+            } catch (e) {
+                alert("error occurs in updating quizzes")
+            }
+        };
+        const handleDeleteButtonClick = async () => {
+            try {
+                await quizzesClient.deleteQuiz(quiz._id);
+                dispatch(deleteQuiz(quizId));
+            } catch (e) {
+                alert("error occurs in deleting quizzes")
+            }
+            };
         const handleEditButtonClick = () => {navigate(`${quizId}`)};
-        const { questions } = useSelector((state: any) => state.questionsReducer);
+        // const { questions } = useSelector((state: any) => state.questionsReducer);
         const { currentUser } = useSelector((state: any) => state.accountReducer); 
-        const questionsInQuiz = questions
-        .filter((q:any) => q.course === courseId && q.quiz === quizId);
-        const quizPoints = questionsInQuiz
-        .reduce((sum: any, q: { points: any; }) => sum + q.points, 0);
+        // const questionsInQuiz = questions
+        // .filter((q:any) => q.course === courseId && q.quiz === quizId);
+        // const quizPoints = questionsInQuiz
+        // .reduce((sum: any, q: { points: any; }) => sum + q.points, 0);
     return (
         <li className="wd-quiz-list-item list-group-item p-3 ps-1 d-flex align-items-center">
              <RxRocket className="m-2 fs-3 "style={{minWidth: "30px"}}/>
@@ -106,7 +146,7 @@ const Quiz = ({quizTitle, quizDue, quizURL, published, quizId,
                  </a> 
                  <p className="m-0">
                     <span className="me-1"><QuizAvailability quizAvailableFrom={quizAvailableFrom} quizAvailableTil={quizAvailableTil}/></span> |
-                     <span className="fw-bold mx-1">Due</span> {quizDue} | {quizPoints} pts | {questionsInQuiz.length} questions
+                     <span className="fw-bold mx-1">Due</span> {quizDue} | {points} pts | {numQuestions} questions
                      {currentUser.role === "STUDENT" ? "| Score 0pt" : ""}
                  </p>
 

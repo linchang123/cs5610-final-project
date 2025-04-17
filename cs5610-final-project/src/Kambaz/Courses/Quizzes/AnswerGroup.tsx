@@ -73,7 +73,7 @@ export default function AnswerGroup({question, setQuestion}:{question: any; setQ
             </Form.Group>
         ));
     } else if (question.questionType === "Fill in the Blank"){
-        if (question.acceptedAnswers.length > 0) {
+        if (question.possibleAnswers.length > 0) {
             answers = question.possibleAnswers.map((a: any) => (
                 <Form.Group className="mb-3 d-flex flex-column flex-md-row align-items-center " controlId="answer">
                     <Form.Label className="me-3 mb-1 text-nowrap">Possible Answer:</Form.Label>

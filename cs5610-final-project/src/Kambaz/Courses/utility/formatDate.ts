@@ -1,9 +1,10 @@
+// format data string to format "MMM DD"
 export default function formatDate(date: string) {
-    const dateTime = date + " 12:00:00";
-    const customDate = new Date(dateTime); 
+    const customDate = new Date(date); 
     const options: Intl.DateTimeFormatOptions = {
         month: 'short',
-        day: 'numeric'
+        day: 'numeric',
+        timeZone: 'UTC'
     };
     const formattedDate: string = customDate.toLocaleDateString(undefined, options);
     return formattedDate;

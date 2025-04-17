@@ -1,13 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { quizzes } from "../../../Database";
+// import { quizzes } from "../../../Database";
 const initialState = {
-    quizzes: quizzes,
+    quizzes: [],
 };
 
 const quizzesSlice = createSlice({
   name: "quizzes",
   initialState,
   reducers: {
+    setQuizzes: (state, action) => {
+      state.quizzes = action.payload;
+    },
     addQuiz: (state, { payload: quiz }) => {
       state.quizzes = [...state.quizzes, {...quiz}] as any;
     },
@@ -32,6 +35,6 @@ const quizzesSlice = createSlice({
     }
   }
 });
-export const { addQuiz, deleteQuiz, updateQuiz, publishQuiz, updateQuizTotalScore } =
+export const { addQuiz, deleteQuiz, updateQuiz, publishQuiz, updateQuizTotalScore, setQuizzes } =
 quizzesSlice.actions;
 export default quizzesSlice.reducer;

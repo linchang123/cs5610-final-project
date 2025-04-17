@@ -4,29 +4,57 @@ import quizProps from "./QuizProps";
 import { TiPencil } from "react-icons/ti";
 import formatDate from "../utility/formatDate";
 import "../../styles.css";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import * as quizzesClient from "./client";
 
 export default function QuizDetails() {
     const { cid, qid } = useParams();
-    const { quizzes } = useSelector((state: any) => state.quizzesReducer);
-    const { questions } = useSelector((state: any) => state.questionsReducer);
-    const questionsInQuiz = questions
-        .filter((q:any) => q.course === cid && q.quiz === qid);
-    const quizPoints = questionsInQuiz
-        .reduce((sum: any, q: { points: any; }) => sum + q.points, 0);
-    for (const q of quizzes) {
-        if (q.course === cid && q._id === qid) {
-            const quiz = {
-                ...q,
+    const [quiz, setQuiz] = useState(null);
+    // const { quizzes } = useSelector((state: any) => state.quizzesReducer);
+    // const { questions } = useSelector((state: any) => state.questionsReducer);
+    // const questionsInQuiz = questions
+    //     .filter((q:any) => q.course === cid && q.quiz === qid);
+    // const quizPoints = questionsInQuiz
+    //     .reduce((sum: any, q: { points: any; }) => sum + q.points, 0);
+    // for (const q of quizzes) {
+    //     if (q.courseId === cid && q._id === qid) {
+    //         const quiz = {
+    //             ...q,
+    //             quizURL: `/Kambaz/Courses/${cid}/Quizzes/${qid}`,
+    //             newQuiz: false,
+    //             points: quizPoints,
+    //             numQuestions: questionsInQuiz
+    //         }
+    //         return (<Details quiz={quiz}/>);
+    //     }
+    // }
+    const fetchQuiz = async () => {
+        try {
+            const q = await quizzesClient.getQuizById(qid as string);
+            // const numQuestions = await quizzesClient.fetchQuizQuestionCount(qid as string);
+            const points = await quizzesClient.fetchQuizPoints(qid as string);
+            setQuiz({...q,
                 quizURL: `/Kambaz/Courses/${cid}/Quizzes/${qid}`,
                 newQuiz: false,
-                points: quizPoints,
-                numQuestions: questionsInQuiz
-            }
-            return (<Details quiz={quiz}/>);
+                //numQuestions: numQuestions,
+                points: points,
+                availableFromDate: q.availableDate,
+                availableTilDate: q.untilDate,
+                attempts: q.howManyAttempts,
+                oneQAtATime: q.oneQuestionAtATime,
+                lockQAfterAnswer: q.lockQuestionsAfterAnswering
+            })
+        } catch (error: any) {
+            alert("error occurs in fetching quizzes")
         }
-    }
-    return (<h1>Details</h1>);
+    };
+    useEffect(() => {
+        fetchQuiz();
+  }, []);
+  if (quiz) {
+    return (<Details quiz={quiz}/>)
+  }
 }
 
 const Details = ({quiz}: {quiz: quizProps}) => {
