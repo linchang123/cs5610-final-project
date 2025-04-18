@@ -7,15 +7,16 @@ import DOMPurify from 'dompurify';
 import { deleteQuestion, editQuestion, addQuestion, setQuestions } from "./reducers/questionsReducer";
 import { useEffect } from "react";
 import * as questionsClient from "./questionsClient";
+import * as quizzesClient from "./client";
 
-export default function QuestionsEditorTab() {
+export default function QuestionsEditorTab({setQuiz, quiz}:{setQuiz: (quiz: any) => void, quiz: any}) {
     const {cid, qid} = useParams();
     const navigate = useNavigate();
     const {questions} = useSelector((state: any) => state.questionsReducer);
     const dispatch = useDispatch();
     const handleNewQuestionButtonClick = () => {
-        const newQuestion = {_id: uuidv4(), course: cid, quiz: qid, title:"New Question", points: 0, questionType: "Multiple Choice", prompt: " ",
-                             possibleAnswers: [], acceptedAnswers:[], editing: true, newQuestion: true}
+        const newQuestion = {_id: uuidv4(), quizId: qid, title:"New Question", points: 0, questionType: "multiple-choice", questionText: " ",
+                             possibleAnswers: [], choices:[], anwers:[], editing: true, newQuestion: true}
         dispatch(addQuestion(newQuestion));
     }
     const fetchQuestions = async () => {
@@ -36,7 +37,7 @@ export default function QuestionsEditorTab() {
             // .filter((question: any) => question.course === cid && question.quiz === qid)
             .map((question: any, index: number) => (
                 question.editing ? 
-                <QuestionEditor question={question}/>
+                <QuestionEditor question={question} quiz={quiz} setQuiz={setQuiz}/>
                 : (<li key={question._id} className="list-group-item m-2 border border-secondary p-0">
                         <div className="wd-quiz-question-header fs-5 fw-bolder text-start bg-secondary p-2 w-100">
                             <span className="m-2">Question {index + 1}</span>
@@ -46,7 +47,9 @@ export default function QuestionsEditorTab() {
                                 <FaTrash className="text-danger me-2 mb-1" onClick={async () => {
                                     try {
                                         await questionsClient.deleteQuestion(question._id);
-                                        dispatch(deleteQuestion(question._id))
+                                        dispatch(deleteQuestion(question._id));
+                                        const quizPoints = await quizzesClient.fetchQuizPoints(qid as string);
+                                        setQuiz({...quiz, points: quizPoints});
                                     } catch (error: any) {
                                         alert("error occurs in deleting question")
                                     }

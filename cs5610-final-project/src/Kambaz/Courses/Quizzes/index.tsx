@@ -15,7 +15,7 @@ import { AiOutlineStop } from "react-icons/ai";
 import { deleteQuiz, publishQuiz, setQuizzes } from "./reducers/reducer";
 import * as quizzesClient from "./client";
 import "../../styles.css";
-import {formatQuiz} from "../utility/formatQuiz";
+// import {formatQuiz} from "../utility/formatQuiz";
 
 export default function Quizzes() {
     const { cid } = useParams();

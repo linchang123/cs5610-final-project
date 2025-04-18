@@ -1,6 +1,6 @@
 import { IoEllipsisVertical } from "react-icons/io5";
 // import { useDispatch, useSelector } from "react-redux";
-import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
 import quizProps from "./QuizProps";
 import GreenCheckmark from "../utility/GreenCheckMark";
 import { AiOutlineStop } from "react-icons/ai";
@@ -9,6 +9,7 @@ import DetailsEditorTab from "./DetailsEditorTab";
 import QuestionsEditorTab from "./QuestionsEditorTab";
 import { useEffect, useState } from "react";
 import * as quizzesClient from "./client";
+// import { useSelector } from "react-redux";
 
 export default function QuizDetailsEditor() {
     const { cid, qid } = useParams();
@@ -80,10 +81,10 @@ export default function QuizDetailsEditor() {
     useEffect(() => {
         fetchQuiz();
   }, [qid]);
-  return (!loading && <Editor quiz={quiz}/>)
+  return (!loading && <Editor quiz={quiz} setQuiz={setQuiz}/>)
 }
 
-const Editor = ({quiz}: {quiz: quizProps}) => {
+const Editor = ({quiz, setQuiz}: {quiz: quizProps, setQuiz: (quiz: any) => void}) => {
         const { pathname } = useLocation();
         const [quizData, setQuizData] = useState<quizProps>(() => ({...quiz}));
     return (
@@ -111,7 +112,7 @@ const Editor = ({quiz}: {quiz: quizProps}) => {
                 <Routes>
                     <Route path="/" element={<Navigate to="Details" />} />
                     <Route path="Details" element={<DetailsEditorTab quizData={quizData} setQuizData={setQuizData}/>}/>
-                    <Route path="Questions" element={<QuestionsEditorTab/>}/>
+                    <Route path="Questions" element={<QuestionsEditorTab quiz={quiz} setQuiz={setQuiz}/>}/>
                 </Routes>
             </div>
             

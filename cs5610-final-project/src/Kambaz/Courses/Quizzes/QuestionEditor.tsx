@@ -4,26 +4,51 @@ import TextEditor from "../utility/TextEditor";
 import AnswerGroup from "./AnswerGroup";
 import { useDispatch } from "react-redux";
 import { updateQuestion, editQuestion, deleteQuestion} from "./reducers/questionsReducer";
+import * as questionsClient from "./questionsClient";
+import * as quizzesClient from "./client";
 
-export default function QuestionEditor({question}:{question: any}) {
+export default function QuestionEditor({question, quiz, setQuiz}:{question: any; quiz: any, setQuiz: (quiz: any) => void}) {
     const dispatch = useDispatch();
     const qType = ["Multiple Choice", "True/False", "Fill in the Blank"];
     const [questionData, setQuestionData] = useState(
         {
-        _id: question?._id,
-        title: question?.title,
-        points: question?.points,
-        prompt: question?.questionText,
-        correctAnswer: question?.correctAnswer,
-        course: question?.course,
-        quiz: question?.quiz,
-        questionType: formatQuestionType(question?.questionType),
+        _id: question._id,
+        title: question.title,
+        points: question.points,
+        questionText: question.questionText,
+        correctAnswer: question.correctAnswer,
+        quizId: question?.quizId,
+        questionType: formatQuestionType(question.questionType),
         choices: question.choices,
-
+        possibleAnswers: question.possibleAnswers,
+        answers: question.answers,
+        newQuestion: question.newQuestion
     }
 );
-    const handleSaveQuestionEdit = () => {
-        dispatch(updateQuestion({...questionData}))
+    const handleSaveQuestionEdit = async () => {
+        const {newQuestion, ...question} = questionData;
+        if (questionData.newQuestion) {
+            try {
+                await questionsClient.createQuestionForQuiz(questionData.quizId as string, 
+                    {...question, questionType: formatQuestionType(question.questionType)});
+                    dispatch(updateQuestion({...question, questionType: formatQuestionType(question.questionType)}));
+                const quizPoints = await quizzesClient.fetchQuizPoints(question.quizId as string);
+                setQuiz({...quiz, points: quizPoints});
+            } catch (error: any) {
+                alert("error occurs in creating question, question prompt and answer should not be blank.")
+            }
+        } else {
+            try {
+                await questionsClient.updateQuestion(questionData._id as string, 
+                    {...question, questionType: formatQuestionType(question.questionType)}
+                );
+                dispatch(updateQuestion({...question, questionType: formatQuestionType(question.questionType)}));
+                const quizPoints = await quizzesClient.fetchQuizPoints(question.quizId as string);
+                setQuiz({...quiz, points: quizPoints});
+            } catch (error: any) {
+                alert("error occurs in updating question, question prompt and answer should not be blank.")
+            }
+        }
     };
     const handleCancelQuestionEdit = () => {
         if (question.newQuestion) {
@@ -33,10 +58,12 @@ export default function QuestionEditor({question}:{question: any}) {
         }
     };
     const handleQuestionTypeChange = (e: any) => {
+        // const questionType = formatQuestionType(e.target.value);
         if (e.target.value === "True/False") {
-            setQuestionData({...questionData, questionType: e.target.value, correctAnswer: {}});
-        } else {
-            setQuestionData({...questionData, questionType: e.target.value, possibleAnswers:[], "acceptedAnswers": []});
+            setQuestionData({...questionData, questionType: e.target.value, correctAnswer: {id: "QQ110-ans1", value: true}, 
+                possibleAnswers: [{id: "QQ110-ans1", value: "True"}, {id: "QQ110-ans2", value: "False"}], choices: [], answers: []});
+        } else{
+            setQuestionData({...questionData, questionType: e.target.value, possibleAnswers:[], choices: [], answers: []});
         }
     };
     return (
@@ -65,7 +92,7 @@ export default function QuestionEditor({question}:{question: any}) {
             </Form>
             <QuestionInstruction questionType={questionData.questionType ? questionData.questionType : ""}/>
             <h5 className="text-start m-3 fw-bold">Question: </h5>
-            <TextEditor object={questionData} setObjectData={setQuestionData} field="prompt"/>
+            <TextEditor object={questionData} setObjectData={setQuestionData} field="questionText"/>
             <h5 className="text-start m-3 fw-bold">Answers: </h5>
             <AnswerGroup question={questionData} setQuestion={setQuestionData}/>
             <br/><br/>
